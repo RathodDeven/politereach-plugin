@@ -1,0 +1,21 @@
+{
+  "name": "politereach",
+  "displayName": "PoliteReach",
+  "version": "0.1.0",
+  "description": "Run LinkedIn outreach from your own LinkedIn accounts with Claude: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and schedule posts. Claude writes and decides; PoliteReach does the sending.",
+  "author": {
+    "name": "PoliteReach",
+    "url": "https://politereach.com"
+  },
+  "homepage": "https://politereach.com",
+  "repository": "https://github.com/RathodDeven/politereach-plugin",
+  "license": "MIT",
+  "keywords": [
+    "linkedin",
+    "outreach",
+    "sales",
+    "prospecting",
+    "lead-generation",
+    "mcp"
+  ]
+}

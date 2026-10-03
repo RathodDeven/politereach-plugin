@@ -1,0 +1,47 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "politereach",
+  "version": "0.1.0",
+  "description": "Run LinkedIn outreach from your own LinkedIn accounts: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and schedule posts. The assistant writes and decides; PoliteReach does the sending.",
+  "author": {
+    "name": "PoliteReach",
+    "url": "https://politereach.com"
+  },
+  "homepage": "https://politereach.com",
+  "repository": "https://github.com/RathodDeven/politereach-plugin",
+  "license": "MIT",
+  "keywords": ["linkedin", "outreach", "sales", "prospecting", "lead-generation"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "PoliteReach",
+        "shortDescription": "LinkedIn outreach, your voice",
+        "longDescription": "PoliteReach runs LinkedIn outreach from your own LinkedIn accounts. You paste profile links; the assistant researches each person, writes the invite note and up to four follow-up messages in your voice, and stages them for your review. On your yes, PoliteReach sends invites at a fixed per-account safety pace, notices acceptances and sends your pre-written messages. It also finds replies waiting on you, drafts answers you approve, screens connection requests people send you, follows up on prospects who agreed to a call, and schedules LinkedIn posts. Nothing is sent without your approval or a send mode you chose. Limitations: it works only with LinkedIn accounts you own and have connected to PoliteReach, it needs a PoliteReach account, and it never asks for LinkedIn passwords or cookies in chat.",
+        "developerName": "PoliteReach",
+        "category": "Productivity",
+        "capabilities": [
+          "Research LinkedIn prospects",
+          "Stage invite and message sequences for approval",
+          "Find and answer LinkedIn replies",
+          "Screen received LinkedIn invitations",
+          "Follow up on agreed calls",
+          "Write and schedule LinkedIn posts",
+          "Report campaign progress and outcomes"
+        ],
+        "websiteURL": "https://politereach.com",
+        "supportURL": "https://politereach.com/contact/",
+        "privacyPolicyURL": "https://politereach.com/privacy/",
+        "termsOfServiceURL": "https://politereach.com/terms/",
+        "defaultPrompt": [
+          "Set up PoliteReach and check my LinkedIn account is ready to send.",
+          "Who replied on LinkedIn and needs an answer from me?",
+          "How is my LinkedIn outreach going this week?"
+        ],
+        "brandColor": "#2563EB",
+        "composerIcon": "./assets/logo.png",
+        "logo": "./assets/logo.png"
+      },
+      "onboardingSkill": "./skills/get-started/SKILL.md"
+    }
+  }
+}

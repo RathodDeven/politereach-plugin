@@ -1,5 +1,7 @@
 # PoliteReach plugin for Claude, ChatGPT and Codex
 
+[![smithery badge](https://smithery.ai/badge/politereach/politereach)](https://smithery.ai/servers/politereach/politereach)
+
 Run LinkedIn outreach from your own LinkedIn accounts by talking to Claude. Claude researches people, writes every invite note and message in your voice, and decides what to answer. [PoliteReach](https://politereach.com) does the LinkedIn work on its servers: it sends invites inside a per-account safety pace, notices acceptances, sends your pre-written message sequence, reads replies, accepts invitations and publishes posts.
 
 The plugin has two parts:

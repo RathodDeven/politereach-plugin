@@ -48,3 +48,4 @@ Call `li_list_accounts`.
 
 1. Build the user's outreach skill: the `outreach-skill-builder` skill.
 2. Start outreach to people: the `start-outreach` skill.
+3. What else PoliteReach does, and what to connect for it (a calendar for booking checks, scheduled tasks for routines): the `using-politereach` skill.

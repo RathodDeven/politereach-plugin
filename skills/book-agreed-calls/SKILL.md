@@ -7,6 +7,19 @@ description: Make sure LinkedIn prospects who agreed to a call actually book it.
 
 PoliteReach stores the booking state, matches names, works out who is due and refuses anything over the limits. It reads no calendar and writes no text: you read the user's calendar through the user's own calendar connector and write every word.
 
+## First: what must be connected
+
+1. **The PoliteReach connector** (`li_*` tools). Missing: use the `get-started` skill.
+2. **A calendar connector in the same app**, for part B. Any of:
+   - Google Calendar.
+   - Microsoft 365 / Outlook calendar.
+   - A Calendly or Cal.com connector that lists bookings.
+   It needs its list-events and get-event (or search-events) tools, allowed to run. Check by loading them before part B.
+   Missing: tell the user "To see who booked, connect your calendar (Google Calendar or Microsoft 365 / Outlook) in this app's connector settings, then ask again." Do part A meanwhile. Skip B and C: without the calendar you cannot rule out that someone already booked, and a nudge to them is wrong. Never guess.
+3. **The booking link** on each account, for nudges: `bookingUrls` in `li_list_accounts`. Missing: ask for it and set it with `li_set_booking_settings` on a yes.
+
+PoliteReach never connects to the calendar. You pass it only each external attendee's name, email, event id, times and description.
+
 ## A. Who agreed but has not booked (no calendar needed)
 
 1. Read the replies waiting on the user (`li_replies_to_answer` with `includeThread: true`) and their conversations from the last 30 days (`li_list_conversations`, `li_conversation_history`).
@@ -14,11 +27,11 @@ PoliteReach stores the booking state, matches names, works out who is due and re
 3. For each one the user approves: `li_track_booking` with `profileUrls`, `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD, their timezone) if they named a day.
 4. Anyone not yet sent the booking link: draft a short reply with the plain link for the user's approval. PoliteReach adds the recipient's name to the link by itself.
 
-## B. Match the calendar (needs a calendar connector)
+## B. Match the calendar (needs the calendar connector)
 
-If no calendar connector (such as Google Calendar) is connected, say so and stop. Never guess whether someone booked.
+No calendar tools loaded: say so with the message above and stop after part A. Never guess whether someone booked.
 
-1. **Find bookings.** List events from 7 days ago to 30 days ahead. Keep booking-tool events (cal.com, Calendly, or the user's booking link in the organiser, description, location or title). Ignore meetings with only the user's own team.
+1. **Find bookings.** On the calendar the bookings land on, list events from 7 days ago to 30 days ahead. Keep booking-tool events (cal.com, Calendly, or the user's booking link in the organiser, description, location or title). Ignore meetings with only the user's own team.
 2. **Match.** One `li_match_contacts` call with every external attendee: `name`, `email`, `eventId`, `startsAt`, `createdAt`, and the full `description`.
    - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`.
    - `ambiguous`: mark nobody; list the candidates for the user.
@@ -27,10 +40,11 @@ If no calendar connector (such as Google Calendar) is connected, say so and stop
    - Gone or cancelled: `li_mark_booking_cancelled`.
    - New start time: `li_mark_booked` with the same event id and the new time.
 
-## C. Nudge or close
+## C. Nudge or close (only after part B ran)
 
 1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded.
-2. Per row, from the messages it carries:
+2. Per row, from the messages it carries (`thread`):
+   - `bookingLinkSentAt` is null: the link never went out. Send it with one line, not a reminder about it.
    - `nudge`: one line pointing back to what they said about the call, then the plain booking link on its own line. Never propose a time, never pitch.
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
@@ -39,7 +53,7 @@ If no calendar connector (such as Google Calendar) is connected, say so and stop
 
 ## Settings
 
-Booking links and limits are per account: `li_set_booking_settings` (`bookingUrls`, `maxNudges`, `closeAfterDays`, `firstNudgeHours`). Current values are in `li_list_accounts`.
+Booking links and limits are per account: `li_set_booking_settings` (`bookingUrls`, `maxNudges`, `closeAfterDays`, `firstNudgeHours`, `cancelRecheckHours`, `prefillName`). Current values are in `li_list_accounts`.
 
 ## Put it on a schedule
 

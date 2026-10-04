@@ -40,7 +40,7 @@ SETUP
 5. li_contact_dossier on everyone: anyone already in a campaign is rejected as "already in pipeline". Someone who invited two accounts stays with the account whose lane fits best.
 6. SCREEN on the headline first (students, job seekers, vendors, competitors, clearly outside my ICP: reject). Enrich only the rest: li_enrich_profiles, then li_enrich_company once per employer.
 7. DECIDE against my skill, every reason traceable to the data: shortlisted, rejected, or wrong lane (they fit, but another account should reach them).
-8. ACCEPT (accept mode): li_accept_invitations with the shortlisted profileUrls, confirmAccept true, wait true. Only outcome "accepted" moves on.
+8. ACCEPT (accept mode): li_accept_invitations with the shortlisted profileUrls, confirmAccept true. It returns a jobId: read it with li_job_result (jobIds, waitMs 120000) until done. Only people whose outcome is "accepted" move on.
 9. SEQUENCE (if on): write day 2 / 7 / 14 in the voice of my skill. Day 2 is four short lines: a greeting, one fact from their profile that sets up the offer, the offer in one line, a concrete ask. 300 characters max. li_list_campaigns, then li_ingest_prospects into the matching campaign with startStage "message", launch true, confirmIngest true, the strategy above, location and IANA timezone filled. If result.campaignCreated is true, move the rows with li_move_contact. Check the first message is due about 48h out; if anything is due now, li_pause_campaign and flag it.
 10. RECORD everyone else with li_mark_invitations, confirmMark true: rejected with a one-line reason, wrong_lane with routeTo, deferred for someone unclear (leave them pending). This is only our record; it never declines anything on LinkedIn.
 

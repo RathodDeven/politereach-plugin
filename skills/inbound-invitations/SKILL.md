@@ -14,7 +14,7 @@ People who invited the user approached first: warm prospects. Accepting is the c
 3. **Screen on the headline first.** Students, job seekers, vendors, competitors, clearly outside the ICP: reject. Enrich only the rest: `li_enrich_profiles`, then `li_enrich_company` once per employer if needed.
 4. **Decide against the user's outreach skill**, every reason traceable to the data: shortlisted, rejected, or wrong lane (fits, but another account should reach them). Unclear: leave pending. An unanswered invite costs nothing; a wrong accept has no undo.
 5. **Show the shortlist** with reasons and the drafted messages. Accept only on a yes (or under a scheduled task's accept mode).
-6. **Accept.** `li_accept_invitations` with the shortlisted `profileUrls`, `confirmAccept: true`, `wait: true`. Read `accepted` and `skipped`. Only people actually accepted move on.
+6. **Accept.** `li_accept_invitations` with the shortlisted `profileUrls` and `confirmAccept: true`. Add `wait: true` only for a handful of people; otherwise it returns a `jobId`: read it with `li_job_result` (`jobIds`, `waitMs: 120000`) until done. Read each person's `outcomes` entry. Only people whose outcome is `accepted` move on.
 7. **Start their sequence** (if the user wants one). Default: day 2, 7 and 14 after accepting. Day 2 is four short lines: a greeting, one fact from their profile that sets up the offer, the offer in one line, a concrete ask; 300 characters max.
    - Strategy: find "Inbound accepted (Day 2/7/14)" with `li_list_strategies`; create it once with `li_create_strategy` if missing.
    - Campaign: one standing campaign per account and offer, named "Inbound — (account) — (offer)", no date. Find it with `li_list_campaigns` and pass its `campaignId`.

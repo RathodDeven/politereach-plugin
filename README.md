@@ -62,12 +62,13 @@ Then install **PoliteReach** from the plugin list and sign in. Codex reads `.age
 **What the skills do there.** The skills are the same as in Claude. They work the same way once the PoliteReach tools are connected. The skill table below applies to every app. Two notes:
 
 - The four routine skills (`answer-replies`, `inbound-invitations`, `book-agreed-calls`, `schedule-posts`) ask your app to create a recurring scheduled task. If your app cannot schedule tasks, run them by hand.
-- `book-agreed-calls` needs a calendar connector in the same app.
+- `book-agreed-calls` needs a calendar connector in the same app (Google Calendar, or Microsoft 365 / Outlook calendar) with its list-events and get-event tools allowed. Without it, it records who agreed but cannot tell who booked, so it sends no nudges.
 
 ## Skills
 
 | Skill | What it does |
 |---|---|
+| `using-politereach` | The overview: what to connect for each job (LinkedIn account, calendar for bookings, scheduled tasks), which skill does what, and every tool with its safety rule. |
 | `get-started` | Connects the connector and your LinkedIn account, checks the account really works, and explains its invite pace and settings. |
 | `outreach-skill-builder` | Interviews you about your company, ICPs and writing voice, then builds your own outreach skill that every other workflow writes with. |
 | `start-outreach` | From LinkedIn profile links: looks each person up, researches what is missing, matches an ICP, writes the whole sequence, stages it for your review and launches on your yes. |

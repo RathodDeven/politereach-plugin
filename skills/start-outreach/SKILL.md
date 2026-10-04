@@ -23,8 +23,11 @@ PoliteReach sends only text that was written and stored beforehand. Write every 
    - No link in the first message. End on a concrete ask. The close is a yes or no question.
    - No em dashes, exclamation marks, emojis or filler. Never invent a client, number, price or date.
 5. **Pick the cadence.** `li_list_strategies`; use one whose steps and delays fit. If none fits, preview `li_create_strategy` (at most 4 message steps) and create it with `confirmCreate: true` only on a yes.
-6. **Preview.** `li_ingest_prospects` with `confirmIngest: false`, the account, the strategy, a campaign name, and each prospect's `connectionNote`, `firstMessage`, `followUp1`..`followUp3` / `closer`. Show the user every word per person, plus `collisions` (already approached) and `suppressed` (on the do-not-contact list, not imported).
-7. **Stage on a yes.** Same call with `confirmIngest: true` and `launch: false`. `launch` defaults to true, so always pass false here. Read `result.warnings`: if the campaign is already live, nothing was held back; say so.
+6. **Preview.** `li_ingest_prospects` with `confirmIngest: false`, the account, the strategy, a campaign name, and each prospect's `connectionNote`, `firstMessage`, `followUp1`..`followUp3` / `closer`. Show the user every word per person. The preview checks nothing else: who was already approached comes back only on the confirmed call.
+7. **Stage on a yes.** Same call with `confirmIngest: true` and `launch: false`. `launch` defaults to true, so always pass false here. Then relay:
+   - `collisions`: people already approached from the user's accounts (information, not a refusal).
+   - `suppressed`: people on the do-not-contact list, not imported.
+   - `result.warnings`: if the campaign is already live, nothing was held back; say so.
 8. **Launch on a second yes.** `li_launch_campaign` with that `campaignId` and `confirmLaunch: true`. Warn first if the campaign holds other staged people: a launch starts all of them.
 
 ## After launch

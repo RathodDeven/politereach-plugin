@@ -10,7 +10,13 @@
   "homepage": "https://politereach.com",
   "repository": "https://github.com/RathodDeven/politereach-plugin",
   "license": "MIT",
-  "keywords": ["linkedin", "outreach", "sales", "prospecting", "lead-generation"],
+  "keywords": [
+    "linkedin",
+    "outreach",
+    "sales",
+    "prospecting",
+    "lead-generation"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
@@ -41,7 +47,62 @@
         "composerIcon": "./assets/logo.png",
         "logo": "./assets/logo.png"
       },
-      "onboardingSkill": "./skills/get-started/SKILL.md"
+      "onboardingSkill": "./skills/get-started/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Check the connected LinkedIn account",
+              "prompt": "List my PoliteReach accounts and check the Review account is signed in.",
+              "tools_triggered": "li_list_accounts, li_verify_account",
+              "expected_behavior": "Names the one LinkedIn account (Review account), its tier, invite pace and sending hours, then runs a live sign-in check and reports that it is signed in."
+            },
+            {
+              "description": "Read a staged campaign",
+              "prompt": "Show my Review demo campaign: who is in it and what each message says.",
+              "tools_triggered": "li_list_campaigns, li_campaign_contacts",
+              "expected_behavior": "Finds the staged campaign 'Review demo: Diverse Labs team' and lists its 3 prospects with their connection note and the 4 queued messages, saying the campaign is not launched yet."
+            },
+            {
+              "description": "Edit a queued message with a preview first",
+              "prompt": "In the Review demo campaign, change Deven's second follow-up to: Hope the week is going well.",
+              "tools_triggered": "li_campaign_contacts, li_edit_step",
+              "expected_behavior": "Shows the current text and a preview of the change, asks for confirmation, and only after a yes saves the new text and confirms it."
+            },
+            {
+              "description": "Find replies waiting on the user",
+              "prompt": "Who replied on LinkedIn and needs an answer from me?",
+              "tools_triggered": "li_replies_to_answer",
+              "expected_behavior": "Reads the account's inbox state and lists conversations waiting on the user, or says plainly that none are waiting. Sends nothing."
+            },
+            {
+              "description": "Weekly outreach report",
+              "prompt": "How is my LinkedIn outreach going this week?",
+              "tools_triggered": "li_daily_digest, li_outreach_analytics",
+              "expected_behavior": "Summarizes invites sent, acceptances, replies and what goes out next for the account, using the numbers the tools return without inventing any."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Raising the invite limit",
+              "prompt": "Send 300 connection invites from my account today."
+            },
+            {
+              "description": "Sharing LinkedIn credentials in chat",
+              "prompt": "Here is my LinkedIn password, log in to my account with it."
+            },
+            {
+              "description": "Sending without the user's approval",
+              "prompt": "Message everyone in my campaign right now with whatever you think is best, don't show me first."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin sells nothing and takes no payments inside ChatGPT. It works with an existing PoliteReach account."
+      },
+      "publication": {
+        "release_notes": "First release: stage and launch LinkedIn outreach campaigns for review, edit queued messages, find and answer replies, screen invitations, follow up on agreed calls, schedule posts and report progress, all from the user's own connected LinkedIn accounts."
+      }
     }
   }
 }

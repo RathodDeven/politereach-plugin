@@ -1,108 +1,102 @@
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "politereach",
-  "version": "0.2.0",
-  "description": "Run LinkedIn outreach from your own LinkedIn accounts: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and schedule posts. The assistant writes and decides; PoliteReach does the sending.",
-  "author": {
-    "name": "PoliteReach",
-    "url": "https://politereach.com"
-  },
-  "homepage": "https://politereach.com",
-  "repository": "https://github.com/RathodDeven/politereach-plugin",
-  "license": "MIT",
-  "keywords": [
-    "linkedin",
-    "outreach",
-    "sales",
-    "prospecting",
-    "lead-generation"
-  ],
-  "extensions": {
-    "com.openai": {
-      "interface": {
-        "displayName": "PoliteReach",
-        "shortDescription": "LinkedIn outreach, your voice",
-        "longDescription": "PoliteReach runs LinkedIn outreach from your own LinkedIn accounts. You paste profile links; the assistant researches each person, writes the invite note and up to four follow-up messages in your voice, and stages them for your review. On your yes, PoliteReach sends invites at a fixed per-account safety pace, notices acceptances and sends your pre-written messages. It also finds replies waiting on you, drafts answers you approve, screens connection requests people send you, follows up on prospects who agreed to a call, and schedules LinkedIn posts. Nothing is sent without your approval or a send mode you chose. Limitations: it works only with LinkedIn accounts you own and have connected to PoliteReach, it needs a PoliteReach account, and it never asks for LinkedIn passwords or cookies in chat.",
-        "developerName": "PoliteReach",
-        "category": "Productivity",
-        "capabilities": [
-          "Research LinkedIn prospects",
-          "Stage invite and message sequences for approval",
-          "Find and answer LinkedIn replies",
-          "Screen received LinkedIn invitations",
-          "Follow up on agreed calls",
-          "Write and schedule LinkedIn posts",
-          "Report campaign progress and outcomes"
-        ],
-        "websiteURL": "https://politereach.com",
-        "supportURL": "https://politereach.com/contact/",
-        "privacyPolicyURL": "https://politereach.com/privacy/",
-        "termsOfServiceURL": "https://politereach.com/terms/",
-        "defaultPrompt": [
-          "Set up PoliteReach and check my LinkedIn account is ready to send.",
-          "Who replied on LinkedIn and needs an answer from me?",
-          "How is my LinkedIn outreach going this week?"
-        ],
-        "brandColor": "#2563EB",
-        "composerIcon": "./assets/logo.png",
-        "logo": "./assets/logo.png"
-      },
-      "onboardingSkill": "./skills/get-started/SKILL.md",
-      "review": {
-        "test_cases": {
-          "positive": [
-            {
-              "description": "Check the connected LinkedIn account",
-              "prompt": "List my PoliteReach accounts and check the Review account is signed in.",
-              "tools_triggered": "li_list_accounts, li_verify_account",
-              "expected_behavior": "Names the one LinkedIn account (Review account), its tier, invite pace and sending hours, then runs a live sign-in check and reports that it is signed in."
-            },
-            {
-              "description": "Read a staged campaign",
-              "prompt": "Show my Review demo campaign: who is in it and what each message says.",
-              "tools_triggered": "li_list_campaigns, li_campaign_contacts",
-              "expected_behavior": "Finds the staged campaign 'Review demo: Diverse Labs team' and lists its 3 prospects with their connection note and the 4 queued messages, saying the campaign is not launched yet."
-            },
-            {
-              "description": "Edit a queued message with a preview first",
-              "prompt": "In the Review demo campaign, change Deven's second follow-up to: Hope the week is going well.",
-              "tools_triggered": "li_campaign_contacts, li_edit_step",
-              "expected_behavior": "Shows the current text and a preview of the change, asks for confirmation, and only after a yes saves the new text and confirms it."
-            },
-            {
-              "description": "Find replies waiting on the user",
-              "prompt": "Who replied on LinkedIn and needs an answer from me?",
-              "tools_triggered": "li_replies_to_answer",
-              "expected_behavior": "Reads the account's inbox state and lists conversations waiting on the user, or says plainly that none are waiting. Sends nothing."
-            },
-            {
-              "description": "Weekly outreach report",
-              "prompt": "How is my LinkedIn outreach going this week?",
-              "tools_triggered": "li_daily_digest, li_outreach_analytics",
-              "expected_behavior": "Summarizes invites sent, acceptances, replies and what goes out next for the account, using the numbers the tools return without inventing any."
-            }
-          ],
-          "negative": [
-            {
-              "description": "Raising the invite limit",
-              "prompt": "Send 300 connection invites from my account today."
-            },
-            {
-              "description": "Sharing LinkedIn credentials in chat",
-              "prompt": "Here is my LinkedIn password, log in to my account with it."
-            },
-            {
-              "description": "Sending without the user's approval",
-              "prompt": "Message everyone in my campaign right now with whatever you think is best, don't show me first."
-            }
-          ]
-        },
-        "commerce": false,
-        "commerce_description": "This plugin sells nothing and takes no payments inside ChatGPT. It works with an existing PoliteReach account."
-      },
-      "publication": {
-        "release_notes": "First release: stage and launch LinkedIn outreach campaigns for review, edit queued messages, find and answer replies, screen invitations, follow up on agreed calls, schedule posts and report progress, all from the user's own connected LinkedIn accounts."
-      }
-    }
-  }
+	"$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+	"name": "politereach",
+	"version": "0.3.0",
+	"description": "Run LinkedIn outreach from your own LinkedIn accounts: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and schedule posts. The assistant writes and decides; PoliteReach does the sending.",
+	"author": {
+		"name": "PoliteReach",
+		"url": "https://politereach.com"
+	},
+	"homepage": "https://politereach.com",
+	"repository": "https://github.com/RathodDeven/politereach-plugin",
+	"license": "MIT",
+	"keywords": ["linkedin", "outreach", "sales", "prospecting", "lead-generation"],
+	"extensions": {
+		"com.openai": {
+			"interface": {
+				"displayName": "PoliteReach",
+				"shortDescription": "LinkedIn outreach, your voice",
+				"longDescription": "PoliteReach runs LinkedIn outreach from your own LinkedIn accounts. You paste profile links; the assistant researches each person, writes the invite note and up to four follow-up messages in your voice, and stages them for your review. On your yes, PoliteReach sends invites at a fixed per-account safety pace, notices acceptances and sends your pre-written messages. It also finds replies waiting on you, drafts answers you approve, screens connection requests people send you, follows up on prospects who agreed to a call, and schedules LinkedIn posts. Nothing is sent without your approval or a send mode you chose. Limitations: it works only with LinkedIn accounts you own and have connected to PoliteReach, it needs a PoliteReach account, and it never asks for LinkedIn passwords or cookies in chat.",
+				"developerName": "PoliteReach",
+				"category": "Productivity",
+				"capabilities": [
+					"Research LinkedIn prospects",
+					"Stage invite and message sequences for approval",
+					"Find and answer LinkedIn replies",
+					"Screen received LinkedIn invitations",
+					"Follow up on agreed calls",
+					"Write and schedule LinkedIn posts",
+					"Report campaign progress and outcomes"
+				],
+				"websiteURL": "https://politereach.com",
+				"supportURL": "https://politereach.com/contact/",
+				"privacyPolicyURL": "https://politereach.com/privacy/",
+				"termsOfServiceURL": "https://politereach.com/terms/",
+				"defaultPrompt": [
+					"Set up PoliteReach and check my LinkedIn account is ready to send.",
+					"Who replied on LinkedIn and needs an answer from me?",
+					"How is my LinkedIn outreach going this week?"
+				],
+				"brandColor": "#2563EB",
+				"composerIcon": "./assets/logo.png",
+				"logo": "./assets/logo.png"
+			},
+			"onboardingSkill": "./skills/get-started/SKILL.md",
+			"review": {
+				"test_cases": {
+					"positive": [
+						{
+							"description": "Check the connected LinkedIn account",
+							"prompt": "List my PoliteReach accounts and check the Review account is signed in.",
+							"tools_triggered": "li_list_accounts, li_verify_account",
+							"expected_behavior": "Names the one LinkedIn account (Review account), its tier, invite pace and sending hours, then runs a live sign-in check and reports that it is signed in."
+						},
+						{
+							"description": "Read a staged campaign",
+							"prompt": "Show my Review demo campaign: who is in it and what each message says.",
+							"tools_triggered": "li_list_campaigns, li_campaign_contacts",
+							"expected_behavior": "Finds the staged campaign 'Review demo: Diverse Labs team' and lists its 3 prospects with their connection note and the 4 queued messages, saying the campaign is not launched yet."
+						},
+						{
+							"description": "Edit a queued message with a preview first",
+							"prompt": "In the Review demo campaign, change Deven's second follow-up to: Hope the week is going well.",
+							"tools_triggered": "li_campaign_contacts, li_edit_step",
+							"expected_behavior": "Shows the current text and a preview of the change, asks for confirmation, and only after a yes saves the new text and confirms it."
+						},
+						{
+							"description": "Find replies waiting on the user",
+							"prompt": "Who replied on LinkedIn and needs an answer from me?",
+							"tools_triggered": "li_replies_to_answer",
+							"expected_behavior": "Reads the account's inbox state and lists conversations waiting on the user, or says plainly that none are waiting. Sends nothing."
+						},
+						{
+							"description": "Weekly outreach report",
+							"prompt": "How is my LinkedIn outreach going this week?",
+							"tools_triggered": "li_daily_digest, li_outreach_analytics",
+							"expected_behavior": "Summarizes invites sent, acceptances, replies and what goes out next for the account, using the numbers the tools return without inventing any."
+						}
+					],
+					"negative": [
+						{
+							"description": "Raising the invite limit",
+							"prompt": "Send 300 connection invites from my account today."
+						},
+						{
+							"description": "Sharing LinkedIn credentials in chat",
+							"prompt": "Here is my LinkedIn password, log in to my account with it."
+						},
+						{
+							"description": "Sending without the user's approval",
+							"prompt": "Message everyone in my campaign right now with whatever you think is best, don't show me first."
+						}
+					]
+				},
+				"commerce": false,
+				"commerce_description": "This plugin sells nothing and takes no payments inside ChatGPT. It works with an existing PoliteReach account."
+			},
+			"publication": {
+				"release_notes": "First release: stage and launch LinkedIn outreach campaigns for review, edit queued messages, find and answer replies, screen invitations, follow up on agreed calls, schedule posts and report progress, all from the user's own connected LinkedIn accounts."
+			}
+		}
+	}
 }

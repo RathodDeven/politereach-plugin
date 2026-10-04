@@ -1,20 +1,20 @@
 {
-  "name": "politereach",
-  "interface": {
-    "displayName": "PoliteReach"
-  },
-  "plugins": [
-    {
-      "name": "politereach",
-      "source": {
-        "source": "local",
-        "path": "./"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    }
-  ]
+	"name": "politereach",
+	"interface": {
+		"displayName": "PoliteReach"
+	},
+	"plugins": [
+		{
+			"name": "politereach",
+			"source": {
+				"source": "local",
+				"path": "./"
+			},
+			"policy": {
+				"installation": "AVAILABLE",
+				"authentication": "ON_INSTALL"
+			},
+			"category": "Productivity"
+		}
+	]
 }

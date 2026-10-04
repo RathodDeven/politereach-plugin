@@ -1,17 +1,17 @@
 {
-  "name": "politereach",
-  "description": "The PoliteReach plugin for Claude: LinkedIn outreach on your own accounts, with Claude as the brain and PoliteReach as the hands.",
-  "owner": {
-    "name": "PoliteReach",
-    "url": "https://politereach.com"
-  },
-  "plugins": [
-    {
-      "name": "politereach",
-      "source": "./",
-      "description": "LinkedIn outreach on your own accounts: research, staged sequences, reply triage, inbound invitations, booked-call follow-up and scheduled posts.",
-      "category": "sales",
-      "tags": ["linkedin", "outreach", "sales", "prospecting"]
-    }
-  ]
+	"name": "politereach",
+	"description": "The PoliteReach plugin for Claude: LinkedIn outreach on your own accounts, with Claude as the brain and PoliteReach as the hands.",
+	"owner": {
+		"name": "PoliteReach",
+		"url": "https://politereach.com"
+	},
+	"plugins": [
+		{
+			"name": "politereach",
+			"source": "./",
+			"description": "LinkedIn outreach on your own accounts: research, staged sequences, reply triage, inbound invitations, booked-call follow-up and scheduled posts.",
+			"category": "sales",
+			"tags": ["linkedin", "outreach", "sales", "prospecting"]
+		}
+	]
 }

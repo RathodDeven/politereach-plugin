@@ -137,8 +137,14 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 **Research** (uses lookups from the allowance; anyone looked up in the last 30 days is free)
 - `li_enrich_profiles`: who people are plus their current employer. `estimateOnly` shows the cost first.
 - `li_enrich_company`: raw web pages about a company for you to read. One lookup per company per 30 days.
+- `li_search_leads`: find people who fit an ICP from LinkedIn's search filters. 1 lookup per person returned; `estimateOnly` first. Results carry temporary search ids: run `li_enrich_profiles` on the people picked before importing.
+- `li_fetch_posts`: a person's latest posts (up to 3, reposts excluded). 1 lookup per person not read in the last 3 days. `no_posts` is not `unreadable`.
 
-Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`.
+**Engagement**
+- `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.
+- In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then waits 20-60 hours.
+
+Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
 
 ## Ground rules, everywhere
 

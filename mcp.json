@@ -1,9 +1,9 @@
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
-  "mcpServers": {
-    "politereach": {
-      "type": "streamable-http",
-      "url": "https://mcp.politereach.com/mcp"
-    }
-  }
+	"$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+	"mcpServers": {
+		"politereach": {
+			"type": "streamable-http",
+			"url": "https://mcp.politereach.com/mcp"
+		}
+	}
 }

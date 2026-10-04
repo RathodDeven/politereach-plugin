@@ -13,14 +13,14 @@ PoliteReach sends LinkedIn outreach from the user's OWN LinkedIn accounts. You (
 |---|---|---|
 | Anything | The PoliteReach connector, signed in with the user's PoliteReach email | claude.ai, Desktop, Cowork: this plugin's **Connectors** tab. Claude Code: `/mcp`, pick `politereach`. ChatGPT or Codex: add `https://mcp.politereach.com/mcp`. No login yet: https://politereach.com |
 | Anything that touches LinkedIn | At least one LinkedIn account added on https://app.politereach.com (**Accounts**), signed in, and checked with `li_verify_account` | New account: add it on the Accounts page. Signed out or security check: `li_login_link`, give the user the link |
-| Sending, research, posting | A plan that covers the account (trial or paid) | Relay the refusal as it is. If it carries a link, pass that link on unchanged; never invent one |
+| Sending, research, posting | A plan that covers the account (trial or paid) | Relay the refusal as it is. If it carries a link, give that link unchanged; never invent one |
 | Research (`li_enrich_profiles`, `li_enrich_company`) | Lookups left in the research allowance (shared across the owner's accounts) | `li_enrich_profiles` with `estimateOnly` first. Out of lookups: say so; `li_contact_dossier` still reads stored research for free |
 | Booking check (who booked), and the nudges that depend on it | A calendar connector in the SAME app: Google Calendar, or Microsoft 365 / Outlook calendar (a Calendly or Cal.com connector that lists bookings also works). Its list-events and get-event tools must be allowed | Tell the user to connect their calendar in the app's connector settings. Until then, record who agreed but say you cannot tell who booked, and send no nudges. Never guess |
 | Booking nudges | The account's booking link, set with `li_set_booking_settings` (`bookingUrls`) | Ask for the link and set it on a yes. Without it no link is noticed as sent |
 | Routines that run on their own | The app's scheduled-tasks feature (claude.ai and Cowork: **Scheduled**; Claude Code: `/schedule`; ChatGPT: tasks), with the tools set to always allow | Run the routine by hand when the user asks |
 | Writing in the user's voice | The user's own outreach skill | The `outreach-skill-builder` skill |
 
-PoliteReach itself never connects to a calendar or a mailbox. You read those through the user's own connectors and pass only what is needed (attendee name, email, event id, times, description).
+PoliteReach itself never connects to a calendar or a mailbox. You read those through the user's own connectors and send PoliteReach only what is needed (attendee name, email, event id, times, description).
 
 ## Which skill for which job
 
@@ -42,7 +42,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 
 **Accounts and health**
 - `li_list_accounts`: every account with tier, invite pace, hours, booking settings, plan, research allowance. Start here.
-- `li_verify_account`: real sign-in check now; a pass clears a security-check hold.
+- `li_verify_account`: real sign-in check now; a successful check clears a security-check hold.
 - `li_login_link`: link for the user to sign in to LinkedIn on PoliteReach's server. Never ask for cookies.
 - `li_session_status`: saved sessions and their status; `verifyLive` checks one in a browser.
 - `li_detect_account_tier`: re-read the account's LinkedIn tier. There is no manual tier setting.
@@ -56,7 +56,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 **Campaigns and import**
 - `li_list_strategies` / `li_create_strategy`: sequence templates, at most 4 messages. Create previews until `confirmCreate`.
 - `li_list_icps` / `li_create_icp`: ICP labels for comparing results. Create previews until `confirmCreate`.
-- `li_ingest_prospects`: the main import, people plus every prefilled message. Preview until `confirmIngest`; pass `launch: false` to stage.
+- `li_ingest_prospects`: the main import, people plus every prefilled message. Preview until `confirmIngest`; set `launch: false` to stage.
 - `li_create_campaign`: manual campaign from targets or CSV. Preview until `confirmCreate`.
 - `li_launch_campaign`: start a staged campaign (`confirmLaunch`). Starts everyone staged in it.
 - `li_pause_campaign`: hold its invites. Already scheduled messages still send.
@@ -72,7 +72,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_scheduled_steps`: every message with a send time, soonest first.
 - `li_accepted_pending_message`: accepted, first message not out yet. `li_due_messages`: steps already due.
 - `li_edit_step`: rewrite unsent steps by step id. Reversible.
-- `li_bulk_edit_steps`: replace one exact sentence across a campaign. `dryRun` is true until you pass false.
+- `li_bulk_edit_steps`: replace one exact sentence across a campaign. `dryRun` is true until you set it to false.
 - `li_cancel_steps`: hold named steps. Cannot be undone; rewrite instead if the message is still wanted.
 - `li_mark_stopped`: end a person's sequence for good. Not a hold.
 
@@ -128,7 +128,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_daily_digest`: one account's day; a blocked account leads.
 - `li_outcome_summary`: the human verdicts plus booking rates. `undecided` means not judged yet.
 - `li_outreach_analytics`: acceptance and reply rates by strategy, ICP, campaign or account.
-- `li_connections`: invite list plus acceptance rate. Pass `sessionLabel`, or the stats blend accounts.
+- `li_connections`: invite list plus acceptance rate. Give `sessionLabel`, or the stats blend accounts.
 
 **Do-not-contact**
 - `li_suppress_profiles`: add people. Preview until `confirmSuppress`. Refused at import, invite and every send.
@@ -148,5 +148,5 @@ Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_p
 - **No cookies or passwords in chat.** If the user pastes one, tell them to delete it and change it. Sign-in happens from `li_login_link`.
 - **A security check or sign-in error means stop.** Tell the user to reconnect the account. Never retry around it.
 - **Never guess the account.** With more than one, every write names it. Two matches is a refusal, not a pick.
-- **Relay refusals.** A refusal says why (plan, do-not-contact, limits, paused account). Pass it on with any link it carries; never work around it.
+- **Relay refusals.** A refusal says why (plan, do-not-contact, limits, paused account). Relay it with any link it carries; never work around it.
 - **Your own accounts only.** At most 4 messages per sequence. A free account drops connection notes.

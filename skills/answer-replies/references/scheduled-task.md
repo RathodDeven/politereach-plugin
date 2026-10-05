@@ -9,7 +9,7 @@ Ask in one message, numbered, defaults in brackets, so the user can answer "defa
 1. Which PoliteReach accounts should it cover? Use the names from `li_list_accounts`. [all of them]
 2. Send or draft? Send: it answers the clear replies itself and flags the rest. Draft: it writes every reply and sends nothing. [draft]
 3. What must always come to you instead of being answered? [pricing beyond what your skill allows, contracts, NDAs, invoices, anything legal]
-4. Your booking link, if your skill does not have it.
+4. Your booking link, if your skill does not have it. And which calendar the bookings land on (connect it in this app: Google Calendar or Microsoft 365 / Outlook), so it can see who already booked.
 5. When should it run, in your timezone? [every 2 hours from 10:00 to 20:00, every day]
 
 ## Part 2: create the task
@@ -29,6 +29,7 @@ CONFIG
 - MODE: (send | draft). In draft mode never call li_send_reply: put each reply you would have sent under DRAFTS in the report.
 - Always flag, never answer: (my list)
 - Booking link: (my link)
+- Calendar connector: (Google Calendar | Microsoft 365 | none)
 
 SETUP
 1. Load my outreach skill (named in CONFIG) and follow its voice and rules for every word.
@@ -43,7 +44,8 @@ FIND WHAT IS OWED
 DECIDE, one per thread
 A. FLAG, never send: anything on the always-flag list, someone asking us to use their own scheduler or contact someone else, anything senior or unclear. Give their last message, why, and a draft I can send myself.
 B. SEND when confident: you understand the ask and the answer needs no fact you would have to invent. li_send_reply on the account the thread is on, confirmSend true, batch with replies[]. A job id means queued; never send twice to anyone.
-If they agreed to a call: send my plain booking link (PoliteReach adds their name), then li_track_booking with agreed true, their words as agreedDayText and agreedDate if they named a day. A row flagged bookingPending wrote again after agreeing: answer what they said, never a booking nudge.
+CALENDAR CHECK BEFORE ANY REPLY (hard): for every row with bookingCheckRequired, anyone who agrees to a call or says they booked, and any thread with my booking link in it, search my calendar for them (full name, then first name + company) before writing. Booked = an event for them created after the link went out. If booked: send NOTHING, li_mark_booked with the event id and start (unclear: li_match_contacts, mark only on match), no li_track_booking, and list them under BOOKED in the report. Search again right before li_send_reply and drop anyone who booked meanwhile. Not booked: send with calendarChecked true. No calendar connector: never send to them; FLAG them instead.
+If they agreed to a call and have not booked: send my plain booking link (point to it if it is already in the last few messages) (PoliteReach adds their name), then li_track_booking with agreed true, their words as agreedDayText and agreedDate if they named a day. A row flagged bookingPending wrote again after agreeing: answer what they said, never a booking nudge.
 If their last message is over 14 days old, open with one short "sorry, this slipped past me."
 C. SKIP dead threads (a flat no, a thumbs up, a vendor pitching us). When unsure between send and skip, flag.
 
@@ -54,6 +56,6 @@ Max 3 short sentences, one idea per line, blank line between lines. No em dashes
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 
-REPORT: FLAGGED first, then SENT (or DRAFTS), each message in a code block, then one "Skipped: N" line per account. Nothing at all: "Nothing owed."
+REPORT: FLAGGED first, then BOOKED (no reply sent), then SENT (or DRAFTS), each message in a code block, then one "Skipped: N" line per account. Nothing at all: "Nothing owed."
 Notify me once only when something was sent, drafted or flagged, first line the counts. Notify too if the run could not work (connector failing, every account blocked).
 ```

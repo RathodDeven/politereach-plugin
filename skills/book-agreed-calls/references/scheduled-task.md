@@ -64,7 +64,7 @@ li_booking_due across my accounts. Read truncated and excluded; never contact an
 - nudge: one line pointing back to what they said about the call, then my booking link on its own line. Never propose a time, never pitch.
 - close: one line, no link: "Should I close this off, or still want a slot this week?" in the tone of the thread.
 Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Write the plain booking link; PoliteReach adds their name to it.
-Send with li_send_reply, confirmSend true: bookingNudge true for nudges, bookingClose true for closes, one call for each. If a row is refused, drop it and never retry that person.
+Right before sending, search the calendar again for each row by full name (then first name + company); anyone who booked since step 1 gets li_mark_booked and no message. Send with li_send_reply, confirmSend true, calendarChecked true: bookingNudge true for nudges, bookingClose true for closes, one call for each. If a row is refused, drop it and never retry that person.
 If the thread shows they already booked, mark booked instead. If they changed their mind, skip and list under NEEDS CHECK.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.

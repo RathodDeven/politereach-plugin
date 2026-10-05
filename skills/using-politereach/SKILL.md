@@ -77,7 +77,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_mark_stopped`: end a person's sequence for good. Not a hold.
 
 **Sending**
-- `li_send_reply`: answer one or many people (`replies`), each from the account the thread is on. Preview until `confirmSend`. A job id means queued; never send twice.
+- `li_send_reply`: answer one or many people (`replies`), each from the account the thread is on. Preview until `confirmSend`. Rows with `bookingCheckRequired` need a calendar search first, then `calendarChecked: true` (booked = send nothing, `li_mark_booked`). A job id means queued; never send twice.
 - `li_send_message`: one message that waits for the result. Preview until `confirmSend`.
 - `li_send_bulk_messages`: many messages from one account in one run. Preview until `confirmSend`; batches of 15 or fewer.
 
@@ -109,7 +109,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_import_invitation_decisions`: one-time import of an old triage ledger. Preview until `confirmImport`.
 
 **Bookings** (you read the calendar; PoliteReach stores state and enforces limits)
-- `li_track_booking`: they agreed to a call (`agreed: true`, `agreedDayText`, `agreedDate`).
+- `li_track_booking`: they agreed to a call (`agreed: true`, `agreedDayText`, `agreedDate`). Search the calendar first: already booked = `li_mark_booked` instead.
 - `li_match_contacts`: calendar attendees to prospects. Mark only `match`, never `ambiguous`.
 - `li_mark_booked`: a call is on the calendar (`calendarEventId`, `meetingStart`); same event, new time is a move.
 - `li_mark_booking_cancelled`: the event is gone or cancelled.

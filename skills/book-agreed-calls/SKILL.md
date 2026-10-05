@@ -25,7 +25,7 @@ PoliteReach never connects to the calendar. You pass it only each external atten
 1. Start with the agreements already tracked; these need no inbox scan. `li_bookings` with `status: "agreed"` is the full waiting list; `li_booking_due` lists only those whose check date has arrived. A row that says agreed but has a `calendarEventId` / `meetingStart`: trust the meeting and flag the mismatch.
 2. Read the replies waiting on the user (`li_replies_to_answer` with `includeThread: true`) and their conversations from the last 30 days (`li_list_conversations`, `li_conversation_history`).
 3. List everyone who agreed to a call, with their own words about when.
-4. For each one the user approves: `li_track_booking` with `profileUrls`, `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD, their timezone) if they named a day.
+4. Before tracking anyone, search the calendar for them (part B tools): someone who already booked gets `li_mark_booked`, never `li_track_booking`, and no message. For each one the user approves: `li_track_booking` with `profileUrls`, `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD, their timezone) if they named a day.
 5. Anyone not yet sent the booking link: draft a short reply with the plain link for the user's approval. PoliteReach adds the recipient's name to the link by itself.
 
 ## B. Match the calendar (needs the calendar connector)
@@ -50,7 +50,8 @@ No calendar tools loaded: say so with the message above and stop after part A. N
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
 3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user.
-4. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person.
+4. Right before sending, search the calendar once more for each person (full name, then first name + company): people book minutes after they are listed. Booked → `li_mark_booked`, send nothing.
+5. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person.
 
 ## Settings
 

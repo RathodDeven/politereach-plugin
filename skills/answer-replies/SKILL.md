@@ -5,6 +5,8 @@ description: Find every LinkedIn reply waiting on the user, draft answers in the
 
 # Answer LinkedIn replies
 
+**Connect the calendar first.** Ask the user to connect their calendar in this app's connector settings (Google Calendar or Microsoft 365 / Outlook) if it is not: it is how you see who already booked a call. Without it, anyone with their booking link is flagged for them, never answered.
+
 Work the whole queue in batches. Every tool here takes a list, so a queue is about six calls, not one browser session per person.
 
 ## 1. Find what is owed
@@ -20,14 +22,18 @@ Read the full thread before judging: `li_conversation_history`. Only if nothing 
 
 - **Flag for the user, never send:** pricing beyond what their skill allows, contracts, NDAs, invoices, anything legal, anything senior or unclear, a request to use their own scheduler or to contact someone else. Give their last message, why, and a draft the user can send.
 - **Reply:** you understand the ask and the answer needs no invented fact. Draft in the user's voice (their outreach skill). If their last message is over 14 days old, open with one short "sorry, this slipped past me."
-- **They agreed to a call:** reply with the plain booking link (PoliteReach adds their name), then `li_track_booking` with `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD) if they named a day. A row flagged `bookingPending` wrote again after agreeing: answer what they said, never a booking nudge.
+- **Calendar check first (hard):** a row with `bookingCheckRequired` (our booking link is out, or a call is booked), anyone who agreed to a call or says they booked: search the user's calendar for them (full name, then first name + company) BEFORE writing. People book within minutes of saying yes; PoliteReach reads no calendar.
+  - Booked: send NOTHING (no "grab a slot", no "see you then"; the booking invite already confirmed it). `li_mark_booked` with the event id and start; unclear match → `li_match_contacts`, mark only on `match`. No `li_track_booking`.
+  - Not booked: answer, and pass `calendarChecked: true` to `li_send_reply` (refused without it).
+  - No calendar connector: never send to them. Flag for the user.
+- **They agreed to a call (not booked):** reply with the plain booking link (PoliteReach adds their name); if our link is in the last few messages, point to it instead of pasting it again. Then `li_track_booking` with `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD) if they named a day. A row flagged `bookingPending` wrote again after agreeing: answer what they said, never a booking nudge.
 - **Skip:** dead threads (a flat no, a thumbs up, a vendor pitching the user). Unsure between reply and skip: flag.
 
 ## 3. Send only what the user approved
 
 Before drafting, check the sending account's `plan` in `li_list_accounts`: a lapsed or ending trial may refuse the send.
 
-Show every draft. On a yes: one `li_send_reply` with `replies: [{profileUrl, message}, ...]` and `confirmSend: true`. Each reply goes from the account the conversation is on. A `jobId` means queued, not failed. Never send twice to the same person; check with one `li_job_result` call (no jobId).
+Show every draft. On a yes, search the calendar once more for anyone with `bookingCheckRequired` and drop whoever booked meanwhile. Then one `li_send_reply` with `replies: [{profileUrl, message}, ...]`, `confirmSend: true`, and `calendarChecked: true` when the batch holds a checked booking row. Each reply goes from the account the conversation is on. A `jobId` means queued, not failed. Never send twice to the same person; check with one `li_job_result` call (no jobId).
 
 ## 4. Record a verdict for every thread read
 

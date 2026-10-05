@@ -9,9 +9,9 @@ Every prospect carries their own copy of the sequence text from the moment they 
 
 ## What goes out soon
 
-`li_scheduled_steps` with `withinHours: 24` (or a `campaignId`). It lists who, which step, the full text, when, the campaign and the sending account, soonest first. Read `truncated`; raise `limit` rather than assume the page is everything.
+`li_scheduled_steps` with `withinHours: 24` for today, `withinHours: 168` for this week (or a `campaignId`). It lists who, which step, the full text, when, the campaign and the sending account, soonest first. Read `truncated`; raise `limit` (max 200) rather than assume the page is everything. The reply has no per-account total: count rows yourself.
 
-Report per account: how many go out, the first few names with times, and any step whose `campaignStatus` is paused. A paused campaign still sends steps that are already scheduled.
+Report per account: how many go out, the first few names with times, and any step whose `campaignStatus` is paused. A step whose `scheduledAt` is already past is overdue, not upcoming: say so. A step with `deferredSendAt` set goes out later than `scheduledAt`. A paused campaign still sends steps that are already scheduled.
 
 ## Change nothing without the user's request
 

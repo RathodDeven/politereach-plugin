@@ -5,7 +5,9 @@ description: Answer where the user's LinkedIn outreach stands in PoliteReach. Us
 
 # Where things stand
 
-All reads below are instant and change nothing unless a step says otherwise. Reads without an account cover every account; scope with `sessionLabel` when the user means one.
+All reads below change nothing unless a step says otherwise. Most are instant; `li_pending_invites` opens the browser. Reads without an account cover every account; scope with `sessionLabel` when the user means one.
+
+If a tool says PoliteReach could not reach its database, retry once, then report that account as unreadable, never as empty.
 
 ## How did today go?
 
@@ -13,11 +15,11 @@ All reads below are instant and change nothing unless a step says otherwise. Rea
 
 ## How are my campaigns doing?
 
-`li_list_campaigns`, then per campaign `li_campaign_contacts` with `view: "summary"` (counts over every contact) or `li_campaign_status`. Show invited, accepted, mid-sequence and stopped. `li_campaign_contacts` rows are paged: read `truncated` before calling a page the whole campaign.
+`li_list_campaigns`: read `truncated`; if true, raise `limit`. A campaign not launched yet sends nothing. Then per campaign `li_campaign_contacts` with `view: "summary"` (counts over every contact) or `li_campaign_status`. Report the `byConnectionStatus` and `byConversationState` counts as they are; there is no separate stopped count. `li_campaign_contacts` rows are paged: read `truncated` before calling a page the whole campaign.
 
 ## Who accepted, and what goes out next?
 
-`li_accepted_pending_message`, then `li_contact_dossier` with `profileUrls` for the exact wording and due time. If something no longer fits:
+`li_accepted_pending_message`: rows already carry `firstMessageText` and `firstStepScheduledAt`. Flag rows whose `firstStepScheduledAt` is in the past, and any with `sendFailed`. If something no longer fits:
 - Change the words: `li_edit_step` (reversible).
 - Hold one message: `li_cancel_steps` (cannot be undone).
 - Stop the person entirely: `li_mark_stopped` (ends their sequence).
@@ -25,7 +27,7 @@ Each only on the user's yes.
 
 ## How many invites am I waiting on?
 
-`li_pending_invites` per account: count and age. Read `reach`: `partial` or `failed` is not an empty list. Withdraw nothing unless the user asks: a withdrawn invite blocks re-inviting that person for about three weeks. On a clear yes: `li_withdraw_invites` with `confirmWithdraw: true`, then `li_withdraw_status`.
+`li_pending_invites` per account opens the browser and can take minutes; pass `maxInvites` for a quick look. Use `pendingOnLinkedIn` for the count. If `ageDays` is 0 on every row, report no ages. Read `reach`: `partial` or `failed` is not an empty list. Withdraw nothing unless the user asks: a withdrawn invite blocks re-inviting that person for about three weeks. On a clear yes: `li_withdraw_invites` with `confirmWithdraw: true`, then `li_withdraw_status`.
 
 ## How are results?
 

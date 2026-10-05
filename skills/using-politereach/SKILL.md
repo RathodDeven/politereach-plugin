@@ -83,7 +83,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 
 **Inbox and conversations**
 - `li_replies_to_answer`: campaign people who replied; `includeThread: true` attaches the thread.
-- `li_list_conversations`: live inbox; `onlyNeedsReply` and `onlyAddressable` give the owed list.
+- `li_list_conversations`: live browser read of the inbox, one account per call; `onlyNeedsReply` and `onlyAddressable` give the owed list. `reachedEnd` false = partial.
 - `li_conversation_history`: stored thread, instant. Empty means never read, not never wrote.
 - `li_read_conversation`: read one thread live. Slow; only when nothing is stored.
 - `li_read_conversations_bulk`: live read of many named people in one session; about six at a time.

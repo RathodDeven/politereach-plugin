@@ -9,10 +9,8 @@ Work the whole queue in batches. Every tool here takes a list, so a queue is abo
 
 ## 1. Find what is owed
 
-Per account, or once with no account for all of them:
-
-- `li_replies_to_answer` with `includeThread: true`: people in campaigns who replied, each with the end of their stored thread.
-- `li_list_conversations` with `onlyNeedsReply: true`, `onlyAddressable: true`, `sinceDays: 30`, per account: catches people never imported into a campaign.
+- `li_replies_to_answer` with `includeThread: true`, once with no account (covers all accounts): people in campaigns who replied, each with the end of their stored thread. Read `truncated`; raise `limit` until it is false.
+- `li_list_conversations` with `onlyNeedsReply: true`, `onlyAddressable: true`, `sinceDays: 30`: catches people never imported into a campaign. A live browser read, one account per call (no account = the default account only): loop over the accounts from `li_list_accounts`. `reachedEnd` false = partial: say so, never "nothing owed".
 
 Merge and dedupe. Ignore threads between the user's own accounts and LinkedIn system messages.
 
@@ -26,6 +24,8 @@ Read the full thread before judging: `li_conversation_history`. Only if nothing 
 - **Skip:** dead threads (a flat no, a thumbs up, a vendor pitching the user). Unsure between reply and skip: flag.
 
 ## 3. Send only what the user approved
+
+Before drafting, check the sending account's `plan` in `li_list_accounts`: a lapsed or ending trial may refuse the send.
 
 Show every draft. On a yes: one `li_send_reply` with `replies: [{profileUrl, message}, ...]` and `confirmSend: true`. Each reply goes from the account the conversation is on. A `jobId` means queued, not failed. Never send twice to the same person; check with one `li_job_result` call (no jobId).
 

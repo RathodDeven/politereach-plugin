@@ -16,16 +16,17 @@ PoliteReach stores the booking state, matches names, works out who is due and re
    - A Calendly or Cal.com connector that lists bookings.
    It needs its list-events and get-event (or search-events) tools, allowed to run. Check by loading them before part B.
    Missing: tell the user "To see who booked, connect your calendar (Google Calendar or Microsoft 365 / Outlook) in this app's connector settings, then ask again." Do part A meanwhile. Skip B and C: without the calendar you cannot rule out that someone already booked, and a nudge to them is wrong. Never guess.
-3. **The booking link** on each account, for nudges: `bookingUrls` in `li_list_accounts`. Missing: ask for it and set it with `li_set_booking_settings` on a yes.
+3. **The booking link** on each account, for nudges: `booking.urls` in `li_list_accounts` (empty = no link). Missing: ask for it and set it with `li_set_booking_settings` on a yes.
 
 PoliteReach never connects to the calendar. You pass it only each external attendee's name, email, event id, times and description.
 
 ## A. Who agreed but has not booked (no calendar needed)
 
-1. Read the replies waiting on the user (`li_replies_to_answer` with `includeThread: true`) and their conversations from the last 30 days (`li_list_conversations`, `li_conversation_history`).
-2. List everyone who agreed to a call, with their own words about when.
-3. For each one the user approves: `li_track_booking` with `profileUrls`, `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD, their timezone) if they named a day.
-4. Anyone not yet sent the booking link: draft a short reply with the plain link for the user's approval. PoliteReach adds the recipient's name to the link by itself.
+1. Start with the agreements already tracked; these need no inbox scan. `li_bookings` with `status: "agreed"` is the full waiting list; `li_booking_due` lists only those whose check date has arrived. A row that says agreed but has a `calendarEventId` / `meetingStart`: trust the meeting and flag the mismatch.
+2. Read the replies waiting on the user (`li_replies_to_answer` with `includeThread: true`) and their conversations from the last 30 days (`li_list_conversations`, `li_conversation_history`).
+3. List everyone who agreed to a call, with their own words about when.
+4. For each one the user approves: `li_track_booking` with `profileUrls`, `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD, their timezone) if they named a day.
+5. Anyone not yet sent the booking link: draft a short reply with the plain link for the user's approval. PoliteReach adds the recipient's name to the link by itself.
 
 ## B. Match the calendar (needs the calendar connector)
 
@@ -53,7 +54,7 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 
 ## Settings
 
-Booking links and limits are per account: `li_set_booking_settings` (`bookingUrls`, `maxNudges`, `closeAfterDays`, `firstNudgeHours`, `cancelRecheckHours`, `prefillName`). Current values are in `li_list_accounts`.
+Booking links and limits are per account: `li_set_booking_settings` (`bookingUrls`, `maxNudges`, `closeAfterDays`, `firstNudgeHours`, `cancelRecheckHours`, `prefillName`). Current values are in `li_list_accounts` (`booking`).
 
 ## Put it on a schedule
 

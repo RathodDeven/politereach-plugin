@@ -43,6 +43,7 @@ Call `li_list_accounts`.
 - `li_account_activity`: what is running now, what is queued, and why. Accounts take turns on shared browsers, so "queued" is usually normal.
 - A security check or sign-in error: stop. Tell the user to reconnect (step 2). Never retry around it.
 - A known outage: `li_pause_account` with `paused: true` holds all work without alerts; `paused: false` resumes. It does not fix a blocked account.
+- `inviteHold` on an account: 3 invites in a row failed the same way, so new invites stopped (messages did not). Tell the user what it says. Clear it with `li_clear_invite_hold` only after they have checked the account on LinkedIn.
 
 ## Next
 

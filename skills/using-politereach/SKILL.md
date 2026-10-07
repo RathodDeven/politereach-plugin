@@ -48,6 +48,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_detect_account_tier`: re-read the account's LinkedIn tier. There is no manual tier setting.
 - `li_rename_account`: rename an account; an empty name follows the LinkedIn name.
 - `li_pause_account`: hold (`paused: true`) or resume all work. For known outages, not a blocked account.
+- `li_clear_invite_hold`: lift the invite breaker's hold (`inviteHold`) after someone has checked the account. Never clear it blind.
 - `li_set_office_hours`: sending hours for invites and scheduled messages. `end` is exclusive.
 - `li_set_auto_withdraw`: daily cleanup of old pending invites. Off by default; a withdrawal blocks re-inviting for about three weeks.
 - `li_account_activity`: what runs now, what is queued, and why. Read before calling anything stuck.

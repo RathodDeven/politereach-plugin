@@ -41,7 +41,7 @@ Load the matching skill and follow it. Use the tool map below only for jobs none
 Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or member id from `li_list_accounts`). "Preview until" a flag means the call is a dry run until that flag is true. Plan and lookups left are in `li_list_accounts` (`plan`, `enrichment`).
 
 **Accounts and health**
-- `li_list_accounts`: every account with tier, invite pace, hours, booking settings, plan, research allowance. Start here.
+- `li_list_accounts`: every account with tier, invite pace, hours, booking settings, plan, research allowance, invite notes this month (`inviteNotes`) and any invite hold (`inviteHold`). Start here.
 - `li_verify_account`: real sign-in check now; a successful check clears a security-check hold.
 - `li_login_link`: link for the user to sign in to LinkedIn on PoliteReach's server. Never ask for cookies.
 - `li_session_status`: saved sessions and their status; `verifyLive` checks one in a browser.

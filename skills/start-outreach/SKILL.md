@@ -12,6 +12,7 @@ PoliteReach sends only text that was written and stored beforehand. Write every 
 - Load the user's outreach skill (their voice, ICPs, proof, banned words). If they have none, offer the `outreach-skill-builder` skill first; otherwise ask for the offer and voice before writing.
 - `li_list_accounts`: pick the sending account. With more than one account, every write must name it (`sessionLabel`). Never guess.
 - Note the account tier: only a Premium account sends connection notes. A free account drops them.
+- Check `inviteNotes` in `li_list_accounts`. Premium can also have a monthly note allowance. When `state` is `spent`, write no connection notes until the date in `guidance`: LinkedIn will not deliver them. The invites still go out, and messages are unaffected.
 
 ## Steps
 
@@ -20,7 +21,7 @@ PoliteReach sends only text that was written and stored beforehand. Write every 
 2. **Research only what is missing.** `li_enrich_profiles` (costs lookups from the user's allowance; anyone looked up in the last 30 days is free; use `estimateOnly` first for a big list). `companyPage` gives the current employer's industry, size and description; it comes only on a real lookup, never with `estimateOnly`. Use `li_enrich_company` only when a first line needs a specific, recent detail. Never an outside scraper.
 3. **Read what they posted.** `li_fetch_posts` (1 lookup per person not read in the last 3 days; reposts excluded). Pick ONE recent post that is their own and worth reacting to; the first touch can then be about something they actually said. `no_posts` means nothing recent, `unreadable` means it could not tell: either way write as usual, about no post.
 4. **Match each person to one ICP.** If none fits, say so and suggest who to target instead. Never force a message.
-5. **Write the whole sequence.** Connection note (Premium only), first message, then follow-ups and a close: at most four messages in all. Follow the user's skill; default rules:
+5. **Write the whole sequence.** Connection note (Premium only, and not while `inviteNotes.state` is `spent`), first message, then follow-ups and a close: at most four messages in all. Follow the user's skill; default rules:
    - Three short sentences at most; follow-ups two short lines, each adding one new reason.
    - No link in the first message. End on a concrete ask. The close is a yes or no question.
    - No em dashes, exclamation marks, emojis or filler. Never invent a client, number, price or date.

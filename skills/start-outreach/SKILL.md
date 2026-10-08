@@ -12,7 +12,7 @@ PoliteReach sends only text that was written and stored beforehand. Write every 
 - Load the user's outreach skill (their voice, ICPs, proof, banned words). If they have none, offer the `outreach-skill-builder` skill first; otherwise ask for the offer and voice before writing.
 - `li_list_accounts`: pick the sending account. With more than one account, every write must name it (`sessionLabel`). Never guess.
 - Note the account tier: only a Premium account sends connection notes. A free account drops them.
-- Check `inviteNotes` in `li_list_accounts`. Premium can also have a monthly note allowance. When `state` is `spent`, write no connection notes until the date in `guidance`: LinkedIn will not deliver them. The invites still go out, and messages are unaffected.
+- Check `inviteNotes` in `li_list_accounts`. Premium can also have a monthly note allowance. When `state` is `spent` (or `not_sent_on_free`), write no connection notes; `guidance` says until when: LinkedIn will not deliver them. The invites still go out, and messages are unaffected.
 
 ## Steps
 

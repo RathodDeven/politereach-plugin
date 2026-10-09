@@ -50,7 +50,8 @@ SETUP
 STEP 1: FIND BOOKINGS
 On the CONFIG calendar, list events from 7 days ago to 30 days ahead. Keep only booking-tool events (cal.com, Calendly, or my booking link in the organiser, description, location or title). Ignore meetings with only my own team.
 For every external attendee pass name, email, eventId, startsAt, createdAt and the full event description to li_match_contacts in one call.
-- match: li_mark_booked with calendarEventId and meetingStart.
+- match: li_mark_booked with calendarEventId and meetingStart. A reply with unchanged true was already recorded: not news for the report.
+If li_match_contacts refuses createdAt or description, pass the rest and add "PoliteReach tools are stale, reconnect the connector" to the report.
 - ambiguous: do not mark. List under NEEDS CHECK with the candidates.
 - none: ignore, unless the attendee gave only one name, then list under NEEDS CHECK.
 
@@ -60,11 +61,11 @@ li_bookings from 7 days ago onward. Get each event from the calendar.
 - Start time changed: li_mark_booked with the same event id and the new time.
 
 STEP 3: NUDGE OR CLOSE
-li_booking_due across my accounts. Read truncated and excluded; never contact anyone excluded. For each row read the thread it carries. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
+li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded. For each row read the thread it carries. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
 - nudge: one line pointing back to what they said about the call, then my booking link on its own line. Never propose a time, never pitch.
 - close: one line, no link: "Should I close this off, or still want a slot this week?" in the tone of the thread.
-Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Write the plain booking link; PoliteReach adds their name to it.
-Right before sending, search the calendar again for each row by full name (then first name + company); anyone who booked since step 1 gets li_mark_booked and no message. Send with li_send_reply, confirmSend true, calendarChecked true: bookingNudge true for nudges, bookingClose true for closes, one call for each. If a row is refused, drop it and never retry that person.
+Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Write the plain booking link with no full stop after it; never add ?name= or any parameter (PoliteReach adds their name), never a short link.
+Right before sending, search the calendar again for each row by full name (then first name + company); anyone who booked since step 1 gets li_mark_booked and no message. Send with li_send_reply, confirmSend true, calendarChecked true: bookingNudge true for nudges, bookingClose true for closes, one call for each. If a row is refused, drop it, resend the rest once, and never retry that person. A returned job id means queued.
 If the thread shows they already booked, mark booked instead. If they changed their mind, skip and list under NEEDS CHECK.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.

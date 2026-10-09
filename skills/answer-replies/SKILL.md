@@ -16,17 +16,18 @@ Work the whole queue in batches. Every tool here takes a list, so a queue is abo
 
 Merge and dedupe. Ignore threads between the user's own accounts and LinkedIn system messages.
 
-Read the full thread before judging: `li_conversation_history`. Only if nothing is stored (an empty result means never read, not never wrote), `li_read_conversation` for that one person. Never one live read per person for the whole queue.
+Read the full thread before judging: `li_conversation_history`. Only if nothing is stored (an empty result means never read, not never wrote), `li_read_conversation` for that one person, with `profileUrl` and `sessionLabel` so the read is stored for next time. Never one live read per person for the whole queue.
 
 ## 2. Decide, one per thread
 
-- **Flag for the user, never send:** pricing beyond what their skill allows, contracts, NDAs, invoices, anything legal, anything senior or unclear, a request to use their own scheduler or to contact someone else. Give their last message, why, and a draft the user can send.
+- **Flag for the user, never send:** pricing beyond what their skill allows (a price question their skill gives a line for is a normal reply), contracts, NDAs, invoices, anything legal, anything senior or unclear, a request to use their own scheduler or to contact someone else. Give their last message, why, and a draft the user can send.
 - **Reply:** you understand the ask and the answer needs no invented fact. Draft in the user's voice (their outreach skill). If their last message is over 14 days old, open with one short "sorry, this slipped past me."
 - **Calendar check first (hard):** a row with `bookingCheckRequired` (our booking link is out, or a call is booked), anyone who agreed to a call or says they booked: search the user's calendar for them (full name, then first name + company) BEFORE writing. People book within minutes of saying yes; PoliteReach reads no calendar.
   - Booked: send NOTHING (no "grab a slot", no "see you then"; the booking invite already confirmed it). `li_mark_booked` with the event id and start; unclear match → `li_match_contacts`, mark only on `match`. No `li_track_booking`.
   - Not booked: answer, and pass `calendarChecked: true` to `li_send_reply` (refused without it).
   - No calendar connector: never send to them. Flag for the user.
-- **They agreed to a call (not booked):** reply with the plain booking link (PoliteReach adds their name); if our link is in the last few messages, point to it instead of pasting it again. Then `li_track_booking` with `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD) if they named a day. A row flagged `bookingPending` wrote again after agreeing: answer what they said, never a booking nudge.
+- **They agreed to a call (not booked):** reply with the plain booking link (PoliteReach adds their name); if our link is in the last few messages, point to it instead of pasting it again. Then `li_track_booking` with `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD) if they named a day. A row flagged `bookingPending` wrote again after agreeing: answer what they said, never a booking nudge. `li_track_booking` already records them as `interested`: give them no other verdict and no `li_mark_reply_handled`.
+- **They say they booked, but the calendar shows nothing yet:** send nothing; `li_mark_outcome` `meeting_booked` with a note. The booking check attaches the event later.
 - **Skip:** dead threads (a flat no, a thumbs up, a vendor pitching the user). Unsure between reply and skip: flag.
 
 ## 3. Send only what the user approved
@@ -52,6 +53,10 @@ Other marks:
 - Flagged threads: mark nothing.
 
 A marked conversation reopens by itself if they write again.
+
+## Warm threads: book the next touch
+
+A thread with no sequence left (they replied, a call happened, a proposal went out, you wait on them) has nothing scheduled, so it gets forgotten. When the next move is to wait, offer a one-time scheduled follow-up for that person, about 7 days out unless the user names a date. Follow `references/follow-up-task.md`.
 
 ## Message rules
 

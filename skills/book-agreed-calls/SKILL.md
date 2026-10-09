@@ -34,7 +34,8 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 
 1. **Find bookings.** On the calendar the bookings land on, list events from 7 days ago to 30 days ahead. Keep booking-tool events (cal.com, Calendly, or the user's booking link in the organiser, description, location or title). Ignore meetings with only the user's own team.
 2. **Match.** One `li_match_contacts` call with every external attendee: `name`, `email`, `eventId`, `startsAt`, `createdAt`, and the full `description`.
-   - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`.
+   - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`. Safe to repeat; a reply with `unchanged: true` was already recorded, so it is not news.
+   - The tool refuses `createdAt` or `description`: the connector's tool list is stale. Pass the other fields and tell the user to reconnect PoliteReach.
    - `ambiguous`: mark nobody; list the candidates for the user.
    - `none`: ignore, unless the attendee gave only one name; then list it for the user.
 3. **Cancelled or moved.** `li_bookings` from 7 days ago onward, compared with the calendar.
@@ -43,15 +44,15 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 
 ## C. Nudge or close (only after part B ran)
 
-1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded.
+1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded. Drop rows from accounts the user did not ask you to cover.
 2. Per row, from the messages it carries (`thread`):
    - `bookingLinkSentAt` is null: the link never went out. Send it with one line, not a reminder about it.
-   - `nudge`: one line pointing back to what they said about the call, then the plain booking link on its own line. Never propose a time, never pitch.
+   - `nudge`: one line pointing back to what they said about the call ("you mentioned thursday for a call, here's the link again"), then the plain booking link on its own line, no full stop after it. Never add `?name=` or any parameter (PoliteReach adds their name), never a short or redirect link. Never propose a time, never pitch.
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
 3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user.
 4. Right before sending, search the calendar once more for each person (full name, then first name + company): people book minutes after they are listed. Booked → `li_mark_booked`, send nothing.
-5. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person.
+5. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person; resend the other rows once. A batch cannot mix nudges and closes. A returned job id means queued.
 
 ## Settings
 

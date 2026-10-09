@@ -34,7 +34,7 @@ Call `li_list_accounts`.
 
 ## 4. Optional settings (only when the user asks)
 
-- Sending hours: `li_set_office_hours`. They hold invites and scheduled messages only, never a message the user sends now. `end` is exclusive (20 means up to 19:59).
+- Sending hours: `li_set_office_hours`. They hold invites and scheduled messages only, never a message the user sends now. `end` is exclusive (20 means up to 19:59). Prospects spread over timezones: `sendWindowMode: "prospect"` sends in each person's local hours (suggested: invites 8-11, messages 8-18); people with no known timezone use the account's hours. One market: set the account's hours to that market's morning.
 - Booking link: `li_set_booking_settings` with `bookingUrls`. PoliteReach adds each recipient's name to the link itself.
 - Invite cleanup: `li_set_auto_withdraw`. Explain first: a withdrawn invite blocks re-inviting that person for about three weeks and cannot be undone. Turn it on only on a clear yes.
 

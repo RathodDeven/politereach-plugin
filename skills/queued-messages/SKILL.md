@@ -15,7 +15,7 @@ Report per account: how many go out, the first few names with times, and any ste
 
 ## Change nothing without the user's request
 
-- Wrong words for one or a few people: `li_edit_step` with the step ids (from `li_scheduled_steps`, `li_campaign_contacts` or `li_contact_dossier`). Reversible; only the words change.
+- Wrong words for one or a few people: `li_edit_step` with the step ids (from `li_scheduled_steps`, `li_campaign_contacts` with `includeSteps: true`, or `li_contact_dossier`). Reversible; only the words change.
 - The same wrong sentence across a campaign: `li_bulk_edit_steps` with `campaignId`, `find` and `replace`. It previews by default (`dryRun` true). Read `matched` and `contactsUnmatched`: a low match means the find text is not what was imported. Run again with `dryRun: false` once the preview is right.
 - A message that should not go at all: `li_cancel_steps` with the step ids. It cannot be undone, so if the message is still wanted, rewrite it with `li_edit_step` instead.
 - Confirm with `li_scheduled_steps` again afterwards.
@@ -24,5 +24,6 @@ Report per account: how many go out, the first few names with times, and any ste
 
 - `li_pause_campaign`: holds the campaign's drip. It does not stop steps already scheduled; cancel or edit those as above.
 - `li_resume_campaign`: a campaign that was launched before restarts its drip by itself. Say so before resuming.
-- A wrong campaign name or ICP: `li_edit_campaign`. Its strategy and sending account cannot change once it holds people.
+- Several campaigns at once: either tool with `campaignIds` (up to 100) or `namePrefix` (+ `sessionLabel` for one account). Without `confirm: true` it only lists what matched; show that list, then repeat with `confirm: true` (a `namePrefix` resume also with `expectCount`, the number listed). Each campaign gets its own result line.
+- A wrong campaign name or ICP: `li_edit_campaign`. Its sending account never changes. Its strategy can change once it holds people only while none of them has been invited or sent anything: `strategyId` with `resnapshot: true` (`dryRun` first) re-copies everyone's steps from the new strategy and keeps their text.
 - The user wants one campaign's invites sent first: `li_edit_campaign` with `priority: true`. The account's other campaigns wait while it has people left to invite, then resume within about an hour. Caps, sending hours and messages are unchanged. `priority: false` puts it back in turn. Read the reply's `note` back to the user.

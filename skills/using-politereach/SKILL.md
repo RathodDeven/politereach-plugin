@@ -14,7 +14,7 @@ PoliteReach sends LinkedIn outreach from the user's OWN LinkedIn accounts. You (
 | Anything | The PoliteReach connector, signed in with the user's PoliteReach email | claude.ai, Desktop, Cowork: this plugin's **Connectors** tab. Claude Code: `/mcp`, pick `politereach`. ChatGPT or Codex: add `https://mcp.politereach.com/mcp`. No login yet: https://politereach.com |
 | Anything that touches LinkedIn | At least one LinkedIn account added on https://app.politereach.com (**Accounts**), signed in, and checked with `li_verify_account` | New account: add it on the Accounts page. Signed out or security check: `li_login_link`, give the user the link |
 | Sending, research, posting | A plan that covers the account (trial or paid) | Relay the refusal as it is. If it carries a link, give that link unchanged; never invent one |
-| Research (`li_enrich_profiles`, `li_enrich_company`) | Lookups left in the research allowance (shared across the owner's accounts) | `li_enrich_profiles` with `estimateOnly` first. Out of lookups: say so; `li_contact_dossier` still reads stored research for free |
+| Research (`li_research_profiles`, `li_enrich_profiles`, `li_enrich_company`) | Lookups left in the research allowance (shared across the owner's accounts) | `li_research_profiles` with `estimateOnly` first. Out of lookups: say so; `li_contact_dossier` still reads stored research for free |
 | Booking check (who booked), and the nudges that depend on it | A calendar connector in the SAME app: Google Calendar, or Microsoft 365 / Outlook calendar (a Calendly or Cal.com connector that lists bookings also works). Its list-events and get-event tools must be allowed | Tell the user to connect their calendar in the app's connector settings. Until then, record who agreed but say you cannot tell who booked, and send no nudges. Never guess |
 | Booking nudges | The account's booking link, set with `li_set_booking_settings` (`bookingUrls`) | Ask for the link and set it on a yes. Without it no link is noticed as sent |
 | Routines that run on their own | The app's scheduled-tasks feature (claude.ai and Cowork: **Scheduled**; Claude Code: `/schedule`; ChatGPT: tasks), with the tools set to always allow | Run the routine by hand when the user asks |
@@ -26,7 +26,7 @@ PoliteReach itself never connects to a calendar or a mailbox. You read those thr
 
 - Set up, connect or reconnect, account health: `get-started`.
 - Build the user's voice, ICPs and offers: `outreach-skill-builder`.
-- Reach out to people from LinkedIn links: `start-outreach`.
+- Reach out to people from LinkedIn links, or split a list into test arms: `start-outreach`.
 - Replies waiting on the user, outcomes, a one-time follow-up for a warm thread: `answer-replies`.
 - Invitations people sent the user: `inbound-invitations`.
 - Who agreed to a call, who booked, nudges: `book-agreed-calls`.
@@ -52,21 +52,23 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_set_office_hours`: sending hours for invites and scheduled messages, or each prospect's local hours (`sendWindowMode`). `end` is exclusive.
 - `li_set_auto_withdraw`: daily cleanup of old pending invites. Off by default; a withdrawal blocks re-inviting for about three weeks.
 - `li_account_activity`: what runs now, what is queued, and why. Read before calling anything stuck.
-- `li_job_result`: what queued work did. A timeout is not a failure; check here, never resend.
+- `li_job_result`: what queued work did. A timeout is not a failure; check here, never resend. A `research_…` job id (from `li_research_profiles`) returns that run's rows, 50 a page from `offset`.
 
 **Campaigns and import**
-- `li_list_strategies` / `li_create_strategy`: sequence templates, at most 4 messages. Create previews until `confirmCreate`.
+- `li_list_strategies` / `li_create_strategy`: sequence templates, at most 4 messages. Create previews until `confirmCreate`. Owned by the user's team (`owner` in the reply).
 - `li_list_icps` / `li_create_icp`: ICP labels for comparing results. Create previews until `confirmCreate`.
-- `li_ingest_prospects`: the main import, people plus every prefilled message. Preview until `confirmIngest`; set `launch: false` to stage.
-- `li_create_campaign`: manual campaign from targets or CSV. Preview until `confirmCreate`.
-- `li_launch_campaign`: start a staged campaign (`confirmLaunch`). Starts everyone staged in it.
-- `li_pause_campaign`: hold its invites. Already scheduled messages still send.
-- `li_resume_campaign`: a previously launched campaign restarts its drip by itself. Say so first.
-- `li_edit_campaign`: rename, change ICP, or `priority: true` so its invites go before the account's other campaigns (only when asked; caps and hours unchanged). Strategy and account cannot change once it holds people.
-- `li_list_campaigns`: campaigns with ids. `li_campaign_status`: counts. `li_campaign_contacts`: per person, paged (read `truncated`).
-- `li_move_contact`: move people between campaigns on the same account, history kept. `allInCampaign` previews and needs `expectCount`.
+- `li_ingest_prospects`: the main import, people plus every prefilled message. Preview until `confirmIngest`; set `launch: false` to stage. ONE call fills many campaigns (up to 500 rows): each row may name its own `sessionLabel`, `campaignName` or `campaignId`, `strategyName` and `icpName`. `defaultSteps` is shared copy for rows without their own (same field names as a row; `{first}` is the only variable). The reply's `campaigns` lists every campaign touched, `routed` each row's outcome, `copy` the rows over a length limit. Pass an `idempotencyKey` and reuse it on a retry.
+- `li_create_campaign`: manual campaign from targets or CSV. Preview until `confirmCreate`. With no targets it creates an empty campaign.
+- `li_launch_campaign`: start a staged campaign (`confirmLaunch`). Starts everyone staged in it. Many at once: `campaignIds` (up to 100) or `namePrefix` (+ `sessionLabel`); without `confirmLaunch` it lists what matched. A `namePrefix` launch also needs `expectCount`, the number the preview listed.
+- `li_pause_campaign`: hold its invites. Already scheduled messages still send. Bulk form as launch, acting only with `confirm: true`.
+- `li_resume_campaign`: a previously launched campaign restarts its drip by itself. Say so first. Bulk form as pause.
+- `li_edit_campaign`: rename, change ICP, or `priority: true` so its invites go before the account's other campaigns (only when asked; caps and hours unchanged). Account never changes. Strategy changes once it holds people only with `resnapshot: true`, while nobody in it has been invited or sent anything (`dryRun` previews; `stepTexts` fills text a new step needs).
+- `li_list_campaigns`: campaigns with ids. Filters `namePrefix`, `sessionLabel`, `minContacts`/`maxContacts`; page on with `nextOffset`; `fields` and `format: "csv"` shrink the reply. `li_campaign_status`: counts.
+- `li_campaign_contacts`: per person, paged (read `truncated`). Compact by default (`stepCounts`, no copy); `includeSteps: true` for step ids and text. Filters `connectionStatus`, `conversationState`, `hasInbound`; `format: "csv"`.
+- `li_move_contact`: move people between campaigns on the same account, history kept. `allInCampaign` previews and needs `expectCount`. `resnapshot: true` re-copies untouched movers' steps from the target campaign's strategy. `idempotencyKey` on retries.
 - `li_reset_contact`: put a contact whose automation died back into the sequence.
-- `li_check_targets`: who was already approached. Not needed before an import; the import reports `collisions`.
+- `li_check_targets`: who was already approached. Not needed before an import; the import reports `collisions`. `view: "people"` lists every campaign each URL is in (up to 1000 URLs, one compact row each); `campaignNamePrefix` names the campaigns being built so anyone already in them shows in `batch.members`.
+- `li_experiment_assign`: an A/B test. Splits people across arms (a strategy each, engage on or off) server side, balanced per ICP and account, and stages one campaign per arm, ICP and account. Preview until `confirmAssign`; launch with `li_launch_campaign` on the reply's `launch.campaignIds`.
 - `li_send_connection_now`: invites only, no messages, queued under the account's pace. Preview until `confirmSend`.
 
 **Queued messages**
@@ -128,7 +130,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 **Reporting**
 - `li_daily_digest`: one account's day; a blocked account leads.
 - `li_outcome_summary`: the human verdicts plus booking rates. `undecided` means not judged yet.
-- `li_outreach_analytics`: acceptance and reply rates by strategy, ICP, campaign or account.
+- `li_outreach_analytics`: acceptance and reply rates by strategy, ICP, campaign or account. `groupBy: "arm"` with `experimentId`: per-arm rates with sample sizes and 95% intervals.
 - `li_connections`: invite list plus acceptance rate. Give `sessionLabel`, or the stats blend accounts.
 
 **Do-not-contact**
@@ -136,10 +138,11 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_list_suppressed`: read the list. `li_unsuppress_profile`: remove one.
 
 **Research** (uses lookups from the allowance; anyone looked up in the last 30 days is free)
+- `li_research_profiles`: up to 500 people in one call, one merged row each: `pipeline` (every campaign they are in), `profile`, `company`, and `posts` when asked. Someone already in the pipeline reuses a stored profile of any age for free. Long lists return a `jobId` for `li_job_result`. `estimateOnly` first. Prefer it to calling the three tools below and joining by URL.
 - `li_enrich_profiles`: who people are plus their current employer. `estimateOnly` shows the cost first.
 - `li_enrich_company`: raw web pages about a company for you to read. One lookup per company per 30 days.
 - `li_search_leads`: find people who fit an ICP from LinkedIn's search filters. 1 lookup per person returned; `estimateOnly` first. Results carry temporary search ids: run `li_enrich_profiles` on the people picked before importing.
-- `li_fetch_posts`: a person's latest posts (up to 3, reposts excluded). 1 lookup per person not read in the last 3 days. `no_posts` is not `unreadable`.
+- `li_fetch_posts`: a person's latest posts (up to 3, reposts excluded). 1 lookup per person not read in the last 3 days. `no_posts` is not `unreadable`. Only a post with `reactable: true` can be an `engagePostUrl`.
 
 **Engagement**
 - `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.

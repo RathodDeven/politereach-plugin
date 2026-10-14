@@ -1,6 +1,6 @@
 ---
 name: queued-messages
-description: Review the LinkedIn messages PoliteReach is about to send and fix or hold queued copy before it goes out. Use when the user asks what goes out today or this week, spots wrong wording in a sequence, wants to change a line across a campaign, hold one message, or pause or resume a campaign.
+description: Review the LinkedIn messages PoliteReach is about to send and fix or hold queued copy before it goes out. Use when the user asks what goes out today or this week, spots wrong wording in a sequence, wants to change a line across a campaign, hold one message, pause or resume a campaign, or have one campaign's invites go first.
 ---
 
 # Review and fix queued messages
@@ -20,8 +20,9 @@ Report per account: how many go out, the first few names with times, and any ste
 - A message that should not go at all: `li_cancel_steps` with the step ids. It cannot be undone, so if the message is still wanted, rewrite it with `li_edit_step` instead.
 - Confirm with `li_scheduled_steps` again afterwards.
 
-## Pause or resume a campaign
+## Pause, resume or prioritise a campaign
 
 - `li_pause_campaign`: holds the campaign's drip. It does not stop steps already scheduled; cancel or edit those as above.
 - `li_resume_campaign`: a campaign that was launched before restarts its drip by itself. Say so before resuming.
 - A wrong campaign name or ICP: `li_edit_campaign`. Its strategy and sending account cannot change once it holds people.
+- The user wants one campaign's invites sent first: `li_edit_campaign` with `priority: true`. The account's other campaigns wait while it has people left to invite, then resume within about an hour. Caps, sending hours and messages are unchanged. `priority: false` puts it back in turn. Read the reply's `note` back to the user.

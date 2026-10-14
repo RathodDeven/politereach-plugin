@@ -62,7 +62,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_launch_campaign`: start a staged campaign (`confirmLaunch`). Starts everyone staged in it.
 - `li_pause_campaign`: hold its invites. Already scheduled messages still send.
 - `li_resume_campaign`: a previously launched campaign restarts its drip by itself. Say so first.
-- `li_edit_campaign`: rename or change ICP. Strategy and account cannot change once it holds people.
+- `li_edit_campaign`: rename, change ICP, or `priority: true` so its invites go before the account's other campaigns (only when asked; caps and hours unchanged). Strategy and account cannot change once it holds people.
 - `li_list_campaigns`: campaigns with ids. `li_campaign_status`: counts. `li_campaign_contacts`: per person, paged (read `truncated`).
 - `li_move_contact`: move people between campaigns on the same account, history kept. `allInCampaign` previews and needs `expectCount`.
 - `li_reset_contact`: put a contact whose automation died back into the sequence.
@@ -145,7 +145,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.
 - In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then waits 20-60 hours.
 
-Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
+Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
 
 ## Ground rules, everywhere
 

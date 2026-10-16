@@ -139,9 +139,10 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 
 **Research** (uses lookups from the allowance; anyone looked up in the last 30 days is free)
 - `li_research_profiles`: up to 500 people in one call, one merged row each: `pipeline` (every campaign they are in), `profile`, `company`, and `posts` when asked. Someone already in the pipeline reuses a stored profile of any age for free. Long lists return a `jobId` for `li_job_result`. `estimateOnly` first. Prefer it to calling the three tools below and joining by URL.
-- `li_enrich_profiles`: who people are plus their current employer. `estimateOnly` shows the cost first.
+- `li_enrich_profiles`: who people are plus their current employer. `estimateOnly` shows the cost first. Each row has `publicProfileUrl` (import this), `memberId` and `searchId`; `profileUrl` is the address as asked.
 - `li_enrich_company`: raw web pages about a company for you to read. One lookup per company per 30 days.
-- `li_search_leads`: find people who fit an ICP from LinkedIn's search filters. 1 lookup per person returned; `estimateOnly` first. Results carry temporary search ids: run `li_enrich_profiles` on the people picked before importing.
+- `li_search_leads`: find people who fit an ICP from LinkedIn's search filters. 1 lookup per person returned; `estimateOnly` first. Results name people by search id (`/in/ACwAA…`); `publicProfileUrl` is set when already known. Import or invite the search id as it is: the server resolves it to the public profile URL first (reported as `searchIds`).
+- `li_resolve_profile_url`: any spelling of a person (vanity, `ACoAA…` member id, `ACwAA…` search id) → public profile URL, member id and search id. Cache free, then 1 lookup, then the account's browser. Read-only; rarely needed, since the import and invite tools resolve search ids themselves.
 - `li_fetch_posts`: a person's latest posts (up to 3, reposts excluded). 1 lookup per person not read in the last 3 days. `no_posts` is not `unreadable`. Only a post with `reactable: true` can be an `engagePostUrl`.
 
 **Engagement**

@@ -113,7 +113,8 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 
 **Bookings** (you read the calendar; PoliteReach stores state and enforces limits)
 - `li_track_booking`: they agreed to a call (`agreed: true`, `agreedDayText`, `agreedDate`). Search the calendar first: already booked = `li_mark_booked` instead.
-- `li_match_contacts`: calendar attendees to prospects. Mark only `match`, never `ambiguous`.
+- `li_match_contacts`: calendar attendees to prospects. Mark only `match`, never `ambiguous`. Skip `ignored`.
+- `li_ignore_calendar_event`: the user says a booking is not from LinkedIn (`eventId`, or `email` for all of theirs; `remove` undoes). `li_match_contacts` then answers `ignored`.
 - `li_mark_booked`: a call is on the calendar (`calendarEventId`, `meetingStart`); same event, new time is a move.
 - `li_mark_booking_cancelled`: the event is gone or cancelled.
 - `li_bookings`: booked calls to compare with the calendar.

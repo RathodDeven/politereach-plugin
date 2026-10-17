@@ -54,6 +54,7 @@ For every external attendee pass name, email, eventId, startsAt, createdAt and t
 If li_match_contacts refuses createdAt or description, pass the rest and add "PoliteReach tools are stale, reconnect the connector" to the report.
 - ambiguous: do not mark. List under NEEDS CHECK with the candidates.
 - none: ignore, unless the attendee gave only one name, then list under NEEDS CHECK.
+- ignored: marked not from LinkedIn earlier. Skip; never list it.
 
 STEP 2: CANCELLED OR MOVED
 li_bookings from 7 days ago onward. Get each event from the calendar.

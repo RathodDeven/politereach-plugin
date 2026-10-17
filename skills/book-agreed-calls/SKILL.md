@@ -37,7 +37,8 @@ No calendar tools loaded: say so with the message above and stop after part A. N
    - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`. Safe to repeat; a reply with `unchanged: true` was already recorded, so it is not news.
    - The tool refuses `createdAt` or `description`: the connector's tool list is stale. Pass the other fields and tell the user to reconnect PoliteReach.
    - `ambiguous`: mark nobody; list the candidates for the user.
-   - `none`: ignore, unless the attendee gave only one name; then list it for the user.
+   - `none`: ignore, unless the attendee gave only one name; then list it for the user. When the user says it is not from LinkedIn: `li_ignore_calendar_event` with its `eventId` (or their `email` for every booking by them).
+   - `ignored`: marked not from LinkedIn earlier. Skip it; never report it.
 3. **Cancelled or moved.** `li_bookings` from 7 days ago onward, compared with the calendar.
    - Gone or cancelled: `li_mark_booking_cancelled`.
    - New start time: `li_mark_booked` with the same event id and the new time.
@@ -52,7 +53,8 @@ No calendar tools loaded: say so with the message above and stop after part A. N
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
 3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user.
 4. Right before sending, search the calendar once more for each person (full name, then first name + company): people book minutes after they are listed. Booked → `li_mark_booked`, send nothing.
-5. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person; resend the other rows once. A batch cannot mix nudges and closes. A returned job id means queued.
+5. Send from no named account: each nudge or close goes from the account its booking row is on (`accountId`), even when the person is on another account too.
+6. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person; resend the other rows once. A batch cannot mix nudges and closes. A returned job id means queued.
 
 ## Settings
 

@@ -41,7 +41,7 @@ SETUP
 1. li_scheduled_posts: skip any grid slot already filled. Fill the next unfilled slots in the coming 3 days. An unusable account: skip its slot and report it; never move its post to another account's day.
 2. One post per slot, text only. If news-anchored, tie it to a real development from the last 72 hours in the space of that account; never invent news, numbers or personal details.
 3. Humanize every post: no em dashes, no AI words, no "not X, it is Y", vary the openings, a blank line (\n\n) between paragraphs, bullet lines single-spaced.
-4. Schedule each with li_schedule_post on its exact account at a varied minute inside the window, ISO time with my offset (never li_create_post: nothing publishes now). Then li_scheduled_posts to confirm the times and that the blank lines survived; if not, li_cancel_scheduled_post and schedule the fixed text again.
+4. Schedule each with li_schedule_post on its exact account (a reply with accountHold means that account cannot post now: list it with its link in the report) at a varied minute inside the window, ISO time with my offset (never li_create_post: nothing publishes now). Then li_scheduled_posts to confirm the times and that the blank lines survived; if not, li_cancel_scheduled_post and schedule the fixed text again.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 

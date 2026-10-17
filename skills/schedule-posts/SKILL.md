@@ -14,7 +14,7 @@ Posting is not capped by PoliteReach. The user's approval is the gate, so never 
 3. **Write.** One text post per slot, up to 3,000 characters. If anchoring to news, use a real development from the last 72 hours in that account's space; never invent news, numbers or personal details. Humanize: no em dashes, no AI words, no "not X, it is Y", varied openings. A blank line (`\n\n`) between paragraphs; bullet lines single-spaced.
 4. **Show every post** with its account, date and time. Change anything the user asks.
 5. **On a yes:**
-   - Later: `li_schedule_post` with `sessionLabel`, `text` and `scheduledAt` (ISO time with the user's offset, a varied minute inside the window). The time is kept exactly as given.
+   - Later: `li_schedule_post` with `sessionLabel`, `text` and `scheduledAt` (ISO time with the user's offset, a varied minute inside the window). The time is kept exactly as given. A reply with `accountHold` means that account cannot post right now (paused, signed out, plan ended): the post fails at its time unless that is fixed, so tell the user and hand over the link in it. Never move the post to another account.
    - Now: `li_create_post` with `confirmPost: false` to preview, then `confirmPost: true`. Only when the user wants it out right now.
    - Optional image: one public `imageUrl` (jpeg, png, gif or webp).
 6. **Confirm.** `li_scheduled_posts` again: check the times and that the blank lines survived. If they did not, `li_cancel_scheduled_post` and schedule the fixed text again.

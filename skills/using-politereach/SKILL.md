@@ -123,7 +123,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - Nudges and closes go out only through `li_send_reply` with `bookingNudge` or `bookingClose`.
 
 **Posts**
-- `li_schedule_post`: post at an exact time the user chose. Cancellable until it goes out.
+- `li_schedule_post`: post at an exact time the user chose. Cancellable until it goes out. `accountHold` in the reply = that account cannot post now; relay its link.
 - `li_create_post`: publish now. Preview until `confirmPost`.
 - `li_scheduled_posts`: queued and recent posts; failed ones carry the reason.
 - `li_cancel_scheduled_post`: cancel one not yet published. A published post stays.
@@ -148,7 +148,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 
 **Engagement**
 - `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.
-- In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then waits 20-60 hours.
+- In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then follows about a day later, in the person's own morning window (or the account's sending hours; 18-30 hours with no window to aim at).
 
 Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
 

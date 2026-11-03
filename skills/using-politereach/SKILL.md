@@ -24,7 +24,7 @@ PoliteReach itself never connects to a calendar or a mailbox. You read those thr
 
 ## Which skill for which job
 
-- Set up, connect or reconnect, account health: `get-started`.
+- Set up, connect or reconnect, account health: `get-started`. Everything in one go (account, outreach skill, routines): its `references/setup-sequence.md`.
 - Build the user's voice, ICPs and offers: `outreach-skill-builder`.
 - Reach out to people from LinkedIn links, or split a list into test arms: `start-outreach`.
 - Replies waiting on the user, outcomes, a one-time follow-up for a warm thread: `answer-replies`.
@@ -39,6 +39,9 @@ Load the matching skill and follow it. Use the tool map below only for jobs none
 ## Tool map
 
 Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or member id from `li_list_accounts`). "Preview until" a flag means the call is a dry run until that flag is true. Plan and lookups left are in `li_list_accounts` (`plan`, `enrichment`).
+
+**Setup**
+- `li_setup_guide`: the same setup and routine instructions these skills carry, served by the connector, so an assistant without the plugin can follow them too. No `step` = the whole sequence; `account`, `outreach_skill`, `replies`, `invitations`, `bookings`, `posts`, `follow_up`, `start_outreach` = one part. Either the skill or this tool is fine.
 
 **Accounts and health**
 - `li_list_accounts`: every account with tier, invite pace, hours, booking settings, plan, research allowance, invite notes this month (`inviteNotes`) and any hold on new invites (`inviteHold`: LinkedIn's weekly limit `WEEKLY_LIMIT`, the invite breaker, or `UNREADABLE`). `invitePace.weeklyCap` is the enforced ceiling; `learnedWeeklyCap`/`learnedAt` (null unless it binds) = lowered after LinkedIn's own weekly-limit refusal, only ever lower, climbing about 10% a week after 2 weeks (our policy). `autoWithdraw.lastRun` is the last cleanup run. Start here.

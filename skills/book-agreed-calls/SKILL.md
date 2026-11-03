@@ -48,7 +48,7 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded. Drop rows from accounts the user did not ask you to cover.
 2. Per row, from the messages it carries (`thread`):
    - `bookingLinkSentAt` is null: the link never went out. Send it with one line, not a reminder about it.
-   - `nudge`: one line pointing back to what they said about the call ("you mentioned thursday for a call, here's the link again"), then the plain booking link on its own line, no full stop after it. Never add `?name=` or any parameter (PoliteReach adds their name), never a short or redirect link. Never propose a time, never pitch.
+   - `nudge`: one line pointing back to what they said about the call ("you mentioned thursday for a call"). If a message of ours after their last one already has the link, point to it ("can you grab a slot from the link above?") and never paste it again; otherwise the plain booking link on its own line, no full stop after it. Never add `?name=` or any parameter (PoliteReach adds their name), never a short or redirect link. Never propose a time, never pitch.
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
    - Greet with the row's `firstName` (already case-fixed). A name typed from elsewhere in all capitals or all lowercase gets normal capitals; a mixed-case one ("McDonald") stays as written.

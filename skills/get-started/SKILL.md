@@ -1,11 +1,13 @@
 ---
 name: get-started
-description: Connect PoliteReach to the user's AI assistant and to a LinkedIn account, then check the account is ready to send. Use when the user is setting up PoliteReach, asks how to connect or reconnect LinkedIn, an account says it needs signing in again, or they ask whether an account is healthy, stuck, blocked or what it is doing right now.
+description: Connect PoliteReach to the user's AI assistant and to a LinkedIn account, then check the account is ready to send. Use when the user is setting up PoliteReach or wants everything set up in one go, asks how to connect or reconnect LinkedIn, an account says it needs signing in again, or they ask whether an account is healthy, stuck, blocked or what it is doing right now.
 ---
 
 # Get started with PoliteReach
 
 PoliteReach sends from the user's OWN LinkedIn accounts. You (the assistant) decide and write; PoliteReach's server does the LinkedIn work. Its tools are named `li_*`.
+
+The user wants everything set up in one go (account, outreach skill, then routines): follow `references/setup-sequence.md`, which starts with the steps below.
 
 ## 1. Check the connector
 
@@ -34,7 +36,7 @@ Call `li_list_accounts`.
 
 ## 4. Optional settings (only when the user asks)
 
-- Sending hours: `li_set_office_hours`. They hold invites and scheduled messages only, never a message the user sends now. `end` is exclusive (20 means up to 19:59). Prospects spread over timezones: `sendWindowMode: "prospect"` sends in each person's local hours (suggested: invites 8-11, messages 8-18); people with no known timezone use the account's hours. One market: set the account's hours to that market's morning.
+- Sending hours: `li_set_office_hours`. They hold invites and scheduled messages only, never a message the user sends now. `end` is exclusive (20 means up to 19:59). Prospects spread over timezones: `sendWindowMode: "prospect"` sends in each person's local hours (suggested: invites 8-11, messages 8-18); people with no known timezone use the account's hours. One market: convert that market's morning into the account's local hours and change only `start` and `end`. Never set the account's `timezone` to the prospects' zone: it is also the browser's timezone.
 - Booking link: `li_set_booking_settings` with `bookingUrls`. PoliteReach adds each recipient's name to the link itself.
 - Invite cleanup: `li_set_auto_withdraw`. Explain first: a withdrawn invite blocks re-inviting that person for about three weeks and cannot be undone. Turn it on only on a clear yes.
 

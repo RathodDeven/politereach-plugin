@@ -4,7 +4,9 @@ Create nothing until the user has answered part 1.
 
 ## Part 1: ask first
 
-Ask in one message, numbered, defaults in brackets. If their outreach skill already answers one, say what you took from it. Ask their timezone if unknown.
+The task writes with the user's outreach skill, named "(company)-politereach-skill". Find it among their skills first. If theirs has another name, ask which one it is and use that name. If they have none, offer to build it first (the `outreach-skill-builder` skill, or `li_setup_guide` step `outreach_skill`) and stop.
+
+Ask in one message, numbered, defaults in brackets. If their PoliteReach skill already answers one, say what you took from it. Ask their timezone if unknown.
 
 1. Which PoliteReach accounts should it cover? Use the names from `li_list_accounts`. [all of them]
 2. Who should it accept, and who never? [the ICPs and the never-contact list in your skill]
@@ -15,9 +17,9 @@ Ask in one message, numbered, defaults in brackets. If their outreach skill alre
 
 ## Part 2: create the task
 
-Create a recurring scheduled task named "LinkedIn invitations" at the chosen time, in the user's timezone, with the TASK PROMPT below: CONFIG filled in, the rest word for word. Attach the user's outreach skill or name it in CONFIG.
+Create a recurring scheduled task named "LinkedIn invitations" at the chosen time, in the user's timezone, with the TASK PROMPT below: CONFIG filled in, the rest word for word. Attach the user's PoliteReach skill to the task and put its exact name in CONFIG, so every run loads it.
 
-Tell the user the task name and next run, and remind them to set every tool it uses to always allow. Choosing accept mode here is the user's standing approval to accept. Offer one run now.
+Tell the user the task name and next run, and remind them to set every tool it uses to always allow: nobody is there to approve a tool while it runs. Choosing accept mode here is the user's standing approval to accept. Offer one run now so they can watch it.
 
 ## TASK PROMPT
 
@@ -25,27 +27,27 @@ Tell the user the task name and next run, and remind them to set every tool it u
 Accept the right LinkedIn invitations and start their sequence via PoliteReach. Nobody is watching this run: never ask a question, decide and act within MODE.
 
 CONFIG
-- Skill: (my outreach skill name)
+- Skill: (my company)-politereach-skill
 - Accounts and what each handles: (my answer)
 - Accept: (who) Never: (who)
 - MODE: (accept | shortlist). In shortlist mode accept nothing and import nothing: report the shortlist with each draft for my yes.
 - Sequence: (yes, day 2/7/14 | no). Strategy "Inbound accepted (Day 2/7/14)"; create it once with li_create_strategy if li_list_strategies does not have it. Campaigns: one per account and offer, named "Inbound — (account) — (offer)".
 
 SETUP
-1. Load my outreach skill (named in CONFIG) and follow its voice and rules for every word.
-2. Make sure the PoliteReach tools (li_*) are loaded. If they are missing, notify me "(task name) failed: PoliteReach not connected" and stop.
+1. Load my outreach skill (named in CONFIG) and follow its voice and rules for every word. If it cannot be loaded, notify me "(task name) failed: skill not found" and stop.
+2. Make sure the PoliteReach tools (li_*) are loaded (if this app defers tools, search for them first). If they are missing, notify me "(task name) failed: PoliteReach not connected" and stop.
 3. li_list_accounts. Use the CONFIG accounts; if a name no longer matches, pick the closest. Skip and report any account that is paused or needs signing in again (fix: Reconnect on the PoliteReach Accounts page).
 
-4. FETCH: per account, li_received_invitations with sessionLabel, onlyUnreviewed true, scrollPasses 40, connection invites only. Read its jobId with li_job_result (jobIds, waitMs 120000) until done. If pageState.reachedEnd is false, read again up to twice, then mark that account "incomplete" in the report. Re-judge anyone with decision.changedSinceDecision on their new headline or company.
-5. li_contact_dossier on everyone: anyone already in a campaign is rejected as "already in pipeline". Someone who invited two accounts stays with the account whose lane fits best; record the other copy as wrong_lane with routeTo.
+4. FETCH: per account, li_received_invitations with sessionLabel, onlyUnreviewed true, scrollPasses 40, connection invites only. Read its jobId with li_job_result (jobIds, waitMs 120000) until done. If pageState.reachedEnd is false, read again up to twice, then mark that account "incomplete" in the report. You get only people never judged, failed accepts to retry, and people whose headline or company changed since they were judged: re-judge anyone with decision.changedSinceDecision on their new headline or company. Keep the counts for the report ("40 already checked").
+5. li_contact_dossier on everyone, in batches of 50: anyone already in a campaign is rejected as "already in pipeline". Someone who invited two accounts stays with the account whose lane fits best; record the other copy as wrong_lane with routeTo.
 6. SCREEN on the headline first (students, job seekers, vendors, competitors, clearly outside my ICP: reject). Enrich only the rest: li_enrich_profiles, then li_enrich_company once per employer.
-7. DECIDE against my skill, every reason traceable to the data: shortlisted, rejected, or wrong lane (they fit, but another account should reach them).
-8. ACCEPT (accept mode): at most 20 per account per run; leave the overflow unmarked for the next run. li_accept_invitations with the shortlisted profileUrls, confirmAccept true. It returns a jobId: read it with li_job_result (jobIds, waitMs 120000) until done. Only people whose outcome is "accepted" move on.
-9. SEQUENCE (if on): write day 2 / 7 / 14 in the voice of my skill. Day 2 is four short lines: a greeting, one fact from their profile that sets up the offer, the offer in one line, a concrete ask. 300 characters max. Line 2 is what their work involves that the offer fixes, never a filler fact (founding year, tenure, follower count); nothing relevant: a short gist of what they do. li_list_campaigns, then li_ingest_prospects into the matching campaign (campaignId; none yet: that exact name as campaignName) with startStage "message", launch true, confirmIngest true, the strategy above, location and IANA timezone filled. If result.campaignCreated is true, move the rows with li_move_contact. Check the first message is due about 48h out; if anything is due now, li_pause_campaign and flag it.
-10. RECORD everyone else per account right after that account's steps 4-9, with li_mark_invitations, confirmMark true, memberId when known: rejected with a one-line reason, wrong_lane with routeTo, deferred for someone unclear (leave them pending). This is only our record; it never declines anything on LinkedIn. Report any row whose status is refused.
+7. DECIDE against my skill, every reason traceable to the data: shortlisted, rejected, wrong lane (they fit, but another account should reach them), or deferred only when the data is too thin to judge. There is no other maybe.
+8. ACCEPT (accept mode): at most 20 per account per run; leave the overflow unmarked for the next run. li_accept_invitations with the shortlisted profileUrls, confirmAccept true. It returns a jobId: read it with li_job_result (jobIds, waitMs 120000) until done. Only people whose outcome is "accepted" move on. It records accepted and failed by itself, so never mark them; a failed one comes back next run.
+9. SEQUENCE (if on): write day 2 / 7 / 14 in the voice of my skill. Day 2 is four short lines: a greeting, one fact from their profile that sets up the offer, the offer in one line, a concrete ask. 300 characters max. Never open with "thanks for connecting". Line 2 is what their work involves that the offer fixes, never a filler fact (founding year, tenure, follower count); nothing relevant: a short gist of what they do. li_list_campaigns, then li_ingest_prospects into the matching campaign (campaignId; none yet: that exact name as campaignName) with startStage "message", launch true, confirmIngest true, the strategy above, location and IANA timezone filled. If result.campaignCreated is true, move the rows with li_move_contact. Report anyone in result.suppressed. Check the first message (messageStage.firstSendAtMin) is due about 48h out; if anything is due now, li_pause_campaign and flag it.
+10. RECORD everyone else per account right after that account's steps 4-9 so a crash loses nothing, with li_mark_invitations, confirmMark true, memberId when known: rejected with a one-line reason, wrong_lane with routeTo, deferred for someone unclear (leave them pending). This is only our record; it never declines anything on LinkedIn. Report any row whose status is refused. A rejected invite is not a do-not-contact: never suppress anyone for it.
 
 MESSAGE RULES (hard)
-Max 3 short sentences, one idea per line, blank line between lines. No em dashes, no exclamation marks, no emojis. No filler: no "just checking in", "circling back", "hope this finds you well". Match my skill's voice. End on a concrete ask, never "let me know". Never invent a price, client, metric or date.
+Max 3 short sentences, one idea per line, blank line between lines. No em dashes, no exclamation marks, no emojis. No filler: no "just checking in", "circling back", "hope this finds you well". Match the tone of the thread and my skill's voice. Never repeat what the thread already covered. End on a concrete ask, never "let me know". Never invent a price, client, metric or date.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 

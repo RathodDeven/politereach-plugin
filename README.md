@@ -27,12 +27,15 @@ Then run `/mcp`, choose `politereach` and sign in.
 1. Go to **Customize > Plugins > Add > Add marketplace** and enter `https://github.com/RathodDeven/politereach-plugin`.
 2. Install **PoliteReach**.
 3. Open the plugin's **Connectors** tab, connect PoliteReach, and sign in with your PoliteReach email.
+4. On the marketplace, turn on **Sync automatically** so new skill versions arrive by themselves.
 
 The plugin is not listed in Anthropic's plugin directory yet. Until it is, use the marketplace above.
 
+Then say "Set me up on PoliteReach" to go through the account, your outreach skill and the routines.
+
 ### Connector only
 
-To use the tools without the skills, add a custom connector with the URL `https://mcp.politereach.com/mcp` and sign in.
+To use the tools without the skills, add a custom connector with the URL `https://mcp.politereach.com/mcp` and sign in. The `li_setup_guide` tool then serves the same setup and routine instructions the skills carry.
 
 ### ChatGPT and Codex
 

@@ -23,7 +23,7 @@ PERSON
 - Profile URL: (profile URL)
 - Sending account: (sessionLabel)
 - What we offer them: (one line)
-- Skill: (my outreach skill name), load it first and follow its voice.
+- Skill: (my company)-politereach-skill. Load it first and follow its voice; if it cannot be loaded, notify me "(task name) failed: skill not found" and stop.
 
 THE THREAD SO FAR
 (the thread in a few lines, oldest first, with dates: what was said, what was agreed, what was sent, who waits on whom)

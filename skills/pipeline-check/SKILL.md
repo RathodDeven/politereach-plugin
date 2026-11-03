@@ -17,7 +17,7 @@ If a tool says PoliteReach could not reach its database, retry once, then report
 
 ## How are my campaigns doing?
 
-`li_list_campaigns`: narrow with `namePrefix`, `sessionLabel` or `minContacts`; read `truncated`, and while it is true call again with `offset` = `nextOffset`. A campaign not launched yet sends nothing. Then per campaign `li_campaign_contacts` with `view: "summary"` (counts over every contact) or `li_campaign_status`. Report the `byConnectionStatus` and `byConversationState` counts as they are; there is no separate stopped count.
+`li_list_campaigns`: narrow with `status`, `namePrefix`, `sessionLabel` or `minContacts`; read `truncated`, and while it is true call again with `offset` = `nextOffset`. A campaign not launched yet sends nothing: `status: "not_launched"` lists those. Then per campaign `li_campaign_contacts` with `view: "summary"` (counts over every contact) or `li_campaign_status`. Report the `byConnectionStatus` and `byConversationState` counts as they are; there is no separate stopped count.
 
 `li_campaign_contacts` rows are paged: read `truncated` before calling a page the whole campaign. Rows are compact by default (`stepCounts`, no message text); pass `includeSteps: true` only to read the copy or get step ids. To list only some people, filter on the server: `connectionStatus` (e.g. `["accepted"]`), `conversationState` (e.g. `["needs_reply"]`) or `hasInbound: true`; `matchingContacts` is the count.
 
@@ -35,13 +35,15 @@ Each only on the user's yes.
 
 ## How many invites am I waiting on?
 
-`li_pending_invites` per account opens the browser and can take minutes; pass `maxInvites` for a quick look. Use `pendingOnLinkedIn` for the count. If `ageDays` is 0 on every row, report no ages. Read `reach`: `partial` or `failed` is not an empty list. Withdraw nothing unless the user asks: a withdrawn invite blocks re-inviting that person for about three weeks. On a clear yes: `li_withdraw_invites` with `confirmWithdraw: true`, then `li_withdraw_status`.
+`li_pending_invites` per account opens the browser and can take minutes; pass `maxInvites` for a quick look. Use `pendingOnLinkedIn` for the count. If `ageDays` is 0 on every row, report no ages. Read `reach`: `partial` or `failed` is not an empty list. Withdraw nothing unless the user asks: a withdrawn invite blocks re-inviting that person for about three weeks. On a clear yes: `li_withdraw_invites` with `confirmWithdraw: true`, then `li_withdraw_status`. `notFound` means gone only when the whole list was read (`reachedEnd: true`); `notReached`/`notReachedCount` are still pending (the walk stopped first, `limitedBy`): never call them gone or re-invite.
+
+Invite cleanup follow-up: read `autoWithdraw.lastRun` in `li_list_accounts`: `withdrawn`, `scanned` of `linkedinPendingTotal`, and `notReachedCount` (stale invites not reached yet). Report `invites.backlogWarning` (`li_account_activity`) when set: a warning only, new invites still go out; if `autoWithdraw.enabled` is false, suggest turning on `li_set_auto_withdraw`; if it is on but `autoWithdraw.untracked` is false, say it withdraws only invites PoliteReach sent. Report the account's learned weekly cap (`invitePace.learnedWeeklyCap`) when set.
 
 ## How are results?
 
-- `li_outcome_summary`: the human verdicts (won, meeting booked, interested, not interested, no outcome). `undecided` means nobody has judged those yet, not that they went badly. Suggest the `answer-replies` skill to close them out.
-- `li_outreach_analytics` compares acceptance and reply rates by strategy, ICP or campaign. If it is refused for the user's access, use `li_campaign_status` per campaign.
-- An A/B test made with `li_experiment_assign`: `li_outreach_analytics` with `groupBy: "arm"` and `experimentId` (without it, it lists the experiments). Each rate carries `k`, `n` and a 95% interval: say when the intervals overlap, which means no winner yet. `forcedToControl` people (no post) are outside the comparison.
+- `li_outcome_summary`: the human verdicts (won, meeting booked, interested, not interested, no outcome). `undecided` means nobody has judged those yet, not that they went badly. Report `repliedNoVerdict` (they replied, no verdict: work owed), not the whole `undecided`; `neverReplied` and `notMessagedYet` have nothing to judge. Suggest the `answer-replies` skill to close them out.
+- `li_outreach_analytics` compares acceptance and reply rates by strategy, ICP or campaign. For reply rates quote `repliedEverRate` (how many people replied), never `replyRate` (only replies still awaiting a verdict). To compare many campaigns: `groupBy: "campaign"` with `namePrefix` or `status`, `fields: ["contacts", "acceptanceRate", "repliedEverRate"]`, or `format: "csv"`; page with `nextOffset`.
+- An A/B test made with `li_experiment_assign`: `li_outreach_analytics` with `groupBy: "arm"` and `experimentId` (without it, it lists the experiments). Each rate (acceptance, reply, booking, `positiveReply`) carries `k`, `n` and a 95% interval: quote `positiveReply` with its `n` and interval, and say when the intervals overlap, which means no winner yet. `forcedToControl` people (no post) are outside the comparison. `acceptanceByEngagement` (reacted / notReacted, `unclear` in neither) explains an arm's acceptance; it is not randomised, so compare arms first and never call it the effect of reacting.
 - Invite pace: from `li_list_accounts` (`invitePace`). It is PoliteReach's own per-tier safety policy, not a LinkedIn rule, and cannot be raised. Never quote one flat number for everyone.
 
 ## Never contact these people

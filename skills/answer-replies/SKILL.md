@@ -46,6 +46,10 @@ One `li_mark_outcome` per verdict, with `profileUrls` and a short `note`:
 - `won`: a deal actually agreed. A demo request is not won.
 - `no_outcome`: ran its course with nothing either way.
 
+A row's `suggestedOutcome` (`not_interested` from a clear opt-out) is a suggestion only, never written: read their message, and only if it really is a no, `li_mark_outcome` `not_interested`. "Remove me" may also warrant `li_suppress_profiles` (on the user's yes).
+
+Then work the verdict queue: `li_marked_conversations` with `outcome: "undecided"` and `dueOnly: true` lists people who replied 48+ hours ago with no verdict (the older part of `repliedNoVerdict` in `li_outcome_summary`, so its count is smaller). Record a verdict for each; `owedReply` rows still need an answer first.
+
 Other marks:
 - Still open after you answered: `li_mark_reply_handled`. It records that the user did their part, not how it went.
 - "Try again in (month)": `li_snooze_reply` with `until`. Nothing is sent when it expires.
@@ -60,7 +64,7 @@ A thread with no sequence left (they replied, a call happened, a proposal went o
 
 ## Message rules
 
-At most three short sentences, one idea per line. No em dashes, exclamation marks, emojis or filler ("just checking in", "circling back"). End on a concrete ask. Never invent a price, client, metric or date.
+At most three short sentences, one idea per line. No em dashes, exclamation marks, emojis or filler ("just checking in", "circling back"). End on a concrete ask. Never invent a price, client, metric or date. A name in all capitals or all lowercase gets normal capitals ("SOHAN" → "Sohan"); a mixed-case name ("McDonald", "deVries") stays exactly as written.
 
 ## Stop conditions
 

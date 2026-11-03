@@ -50,9 +50,11 @@ If their last message is over 14 days old, open with one short "sorry, this slip
 C. SKIP dead threads (a flat no, a thumbs up, a vendor pitching us). When unsure between send and skip, flag.
 
 RECORD A VERDICT for every thread read, one li_mark_outcome call per verdict per account with a short note: not_interested (a clear no), interested (wants to talk, nothing agreed), meeting_booked (a call actually booked), won (a deal actually agreed; a demo is not), no_outcome (ran its course). For someone in no campaign, pass their profile URL, conversationUrn and sessionLabel. Still open after a send: li_mark_reply_handled. "Try again in (month)": li_snooze_reply. Skipped dead threads: li_mark_reviewed with conversationUrn, lastMessageAt, decision (skip | vendor_pitch | no_action) and sessionLabel, so the next run does not re-read them. Flagged: mark nothing.
+A row's suggestedOutcome is a suggestion only, never a verdict: read their message, and mark not_interested only if it really is a no. "Remove me" or "stop messaging": list them under FLAGGED for a do-not-contact decision; never call li_suppress_profiles yourself.
+VERDICT QUEUE: then li_marked_conversations with outcome "undecided" and dueOnly true (people who replied 48+ hours ago with no verdict). Read each thread (li_conversation_history) and record a verdict as above; suggestedOutcome on these rows is a suggestion too. Rows listed under excluded.owedReply still need an answer: they are in the queue above.
 
 MESSAGE RULES (hard)
-Max 3 short sentences, one idea per line, blank line between lines. No em dashes, no exclamation marks, no emojis. No filler: no "just checking in", "circling back", "hope this finds you well". Match the tone of the thread and my skill's voice. End on a concrete ask, never "let me know". Never invent a price, client, metric or date.
+Max 3 short sentences, one idea per line, blank line between lines. No em dashes, no exclamation marks, no emojis. No filler: no "just checking in", "circling back", "hope this finds you well". Match the tone of the thread and my skill's voice. End on a concrete ask, never "let me know". Never invent a price, client, metric or date. A name in all capitals or all lowercase gets normal capitals ("SOHAN" → "Sohan"); a mixed-case name ("McDonald", "deVries") stays exactly as written.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 

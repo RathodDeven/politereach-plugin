@@ -85,7 +85,7 @@ Then install **PoliteReach** from the plugin list and sign in. Codex reads `.age
 
 - **You approve before anything is sent.** Every tool that sends, accepts, posts or writes previews first. A scheduled routine sends only in the mode you chose when you set it up.
 - **Text is written ahead.** PoliteReach sends the words you approved and stored; it never writes messages on its own.
-- **Invite pace is fixed per account.** It depends on the account's LinkedIn tier. It is PoliteReach's own safety policy, not a limit LinkedIn publishes, and it cannot be raised.
+- **Invite pace is fixed per account.** It depends on the account's LinkedIn tier. It is PoliteReach's own safety policy, not a limit LinkedIn publishes, and it cannot be raised. After LinkedIn refuses with its own weekly limit, that account's weekly ceiling is lowered for a while. Too many invitations pending on LinkedIn only raise a warning (new invites still go out); turn on auto-withdraw to clean up old ones.
 - **No LinkedIn passwords or cookies in chat.** LinkedIn sign-in happens in a real browser on PoliteReach's server, from a link PoliteReach gives you.
 - **Your own LinkedIn accounts only.** Do-not-contact lists are checked before every invite and automated message.
 

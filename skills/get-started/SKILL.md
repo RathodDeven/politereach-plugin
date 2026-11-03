@@ -28,7 +28,7 @@ Call `li_list_accounts`.
 
 - `li_verify_account` for the account. Health is otherwise only updated after something fails, so an idle account can look fine while signed out. A pass also clears a security-check hold.
 - Read back from `li_list_accounts`, per account, in plain words:
-  - Tier and invite pace (`invitePace`). These limits are PoliteReach's own safety policy, set per tier. They are not LinkedIn's published rules and cannot be raised. Quote the account's own numbers; never state one flat cap for everybody.
+  - Tier and invite pace (`invitePace`). These limits are PoliteReach's own safety policy, set per tier. They are not LinkedIn's published rules and cannot be raised. Quote the account's own numbers; never state one flat cap for everybody. When `invitePace.learnedWeeklyCap` is set, quote it too: the weekly ceiling was lowered after LinkedIn's own weekly-limit refusal (since `learnedAt`) and climbs back about 10% a week after two weeks.
   - Sending hours, booking link, plan and research allowance.
   - Invite cleanup (auto-withdraw): off unless the user turned it on.
 
@@ -43,7 +43,8 @@ Call `li_list_accounts`.
 - `li_account_activity`: what is running now, what is queued, and why. Accounts take turns on shared browsers, so "queued" is usually normal.
 - A security check or sign-in error: stop. Tell the user to reconnect (step 2). Never retry around it.
 - A known outage: `li_pause_account` with `paused: true` holds all work without alerts; `paused: false` resumes. It does not fix a blocked account.
-- `inviteHold` on an account: 3 invites in a row failed the same way, so new invites stopped (messages did not). Tell the user what it says. Clear it with `li_clear_invite_hold` only after they have checked the account on LinkedIn.
+- `inviteHold` on an account: new invites are held (messages are not). Kind `WEEKLY_LIMIT` = LinkedIn refused with its own weekly limit; it lifts by itself at `until`, and `li_clear_invite_hold` cannot lift it. Its reason's numbers are a dated snapshot from the refusal, not the live `invites.weekSent`. Any other kind = 3 invites in a row failed the same way: clear it with `li_clear_invite_hold` only after the user has checked the account on LinkedIn. `UNREADABLE` = could not read; nothing goes out until it can.
+- `invites.backlogWarning` (`li_account_activity`): a warning only, many invites are pending on LinkedIn; new invites still go out. If `autoWithdraw.enabled` is false, suggest the user turn on invite cleanup (step 4). If it is on but `autoWithdraw.untracked` is false, it withdraws only invites PoliteReach sent. Never switch either on for them.
 
 ## Next
 

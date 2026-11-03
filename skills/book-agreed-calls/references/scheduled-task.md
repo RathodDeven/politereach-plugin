@@ -65,7 +65,7 @@ STEP 3: NUDGE OR CLOSE
 li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded. For each row read the thread it carries. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
 - nudge: one line pointing back to what they said about the call, then my booking link on its own line. Never propose a time, never pitch.
 - close: one line, no link: "Should I close this off, or still want a slot this week?" in the tone of the thread.
-Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Write the plain booking link with no full stop after it; never add ?name= or any parameter (PoliteReach adds their name), never a short link.
+Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Greet with the row's firstName (already case-fixed); never write a name in all capitals. Write the plain booking link with no full stop after it; never add ?name= or any parameter (PoliteReach adds their name), never a short link.
 Right before sending, search the calendar again for each row by full name (then first name + company); anyone who booked since step 1 gets li_mark_booked and no message. Send with li_send_reply, confirmSend true, calendarChecked true: bookingNudge true for nudges, bookingClose true for closes, one call for each. If a row is refused, drop it, resend the rest once, and never retry that person. A returned job id means queued.
 If the thread shows they already booked, mark booked instead. If they changed their mind, skip and list under NEEDS CHECK.
 

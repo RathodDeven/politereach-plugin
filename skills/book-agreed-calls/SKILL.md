@@ -51,6 +51,7 @@ No calendar tools loaded: say so with the message above and stop after part A. N
    - `nudge`: one line pointing back to what they said about the call ("you mentioned thursday for a call, here's the link again"), then the plain booking link on its own line, no full stop after it. Never add `?name=` or any parameter (PoliteReach adds their name), never a short or redirect link. Never propose a time, never pitch.
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
+   - Greet with the row's `firstName` (already case-fixed). A name typed from elsewhere in all capitals or all lowercase gets normal capitals; a mixed-case one ("McDonald") stays as written.
 3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user.
 4. Right before sending, search the calendar once more for each person (full name, then first name + company): people book minutes after they are listed. Booked → `li_mark_booked`, send nothing.
 5. Send from no named account: each nudge or close goes from the account its booking row is on (`accountId`), even when the person is on another account too.

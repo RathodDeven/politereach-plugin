@@ -1,8 +1,8 @@
 {
 	"$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
 	"name": "politereach",
-	"version": "0.5.0",
-	"description": "Run LinkedIn outreach from your own LinkedIn accounts: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and schedule posts. The assistant writes and decides; PoliteReach does the sending.",
+	"version": "0.6.0",
+	"description": "Run LinkedIn outreach from your own LinkedIn accounts: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and warm leads, and schedule posts. The assistant writes and decides; PoliteReach does the sending.",
 	"author": {
 		"name": "PoliteReach",
 		"url": "https://politereach.com"
@@ -25,6 +25,7 @@
 					"Find and answer LinkedIn replies",
 					"Screen received LinkedIn invitations",
 					"Follow up on agreed calls",
+					"Plan follow-ups for warm leads",
 					"Write and schedule LinkedIn posts",
 					"Report campaign progress and outcomes"
 				],

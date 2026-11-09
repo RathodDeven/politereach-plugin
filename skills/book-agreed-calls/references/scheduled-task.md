@@ -17,15 +17,16 @@ Create nothing until the user has answered part 1.
 
 ## Part 1: ask first
 
-Ask in one message, numbered, defaults in brackets. If their outreach skill already answers one, say what you took from it. Ask their timezone if unknown.
+If this app has a tool for asking a question with options to pick, ask each question with it (the default first; the user can always type their own answer). Otherwise ask in one message, numbered, defaults in brackets. If their outreach skill already answers one, say what you took from it. Ask their timezone if unknown.
 
 1. Which PoliteReach accounts should it cover? Use the names from `li_list_accounts`. [all of them]
 2. Your booking link on each account. Check `li_list_accounts`; if one is missing, ask and set it with `li_set_booking_settings`. [what PoliteReach already has]
-3. Which calendar connector and calendar do your bookings land on? [the connected one, your primary calendar]
-4. Send the nudge and the close itself, or draft them for you? [draft them for you]
-5. The email domain of your own team, so internal meetings are ignored.
-6. Anyone who books on your calendar but never through LinkedIn (their email). Mark each with `li_ignore_calendar_event` now, so every run skips them. [none]
-7. When should it run, in your timezone? [every day at 11:20, 15:20 and 19:20]
+3. How fast to follow up after the link? Each number is days after your previous message; the last one is the close. A change is saved with `li_set_booking_settings` (`nudgeScheduleDays`) on each account. [2, 5, 10: a nudge after 2 days, another 5 days later, a close 10 days after that]
+4. Which calendar connector and calendar do your bookings land on? [the one in your outreach skill, your primary calendar]
+5. Send the nudge and the close itself, or draft them for you? [draft them for you]
+6. The email domain of your own team, so internal meetings are ignored.
+7. Anyone who books on your calendar but never through LinkedIn (their email). Mark each with `li_ignore_calendar_event` now, so every run skips them. [none]
+8. When should it run, in your timezone? [every day at 11:20, 15:20 and 19:20]
 
 ## Part 2: create the task
 
@@ -53,7 +54,7 @@ SETUP
 STEP 1: FIND BOOKINGS
 On the CONFIG calendar, list events from 7 days ago to 30 days ahead. Keep only booking-tool events (cal.com, Calendly, or my booking link in the organiser, description, location or title). Ignore meetings with only my own team.
 For every external attendee pass name, email, eventId, startsAt, createdAt and the full event description to li_match_contacts in one call.
-- match: li_mark_booked with calendarEventId and meetingStart. A reply with unchanged true was already recorded: not news for the report.
+- match: li_mark_booked with calendarEventId and meetingStart. A reply with unchanged true was already recorded: not news for the report. If the attendee's email is not on my team domain, li_set_contact_email with it.
 If li_match_contacts refuses createdAt or description, pass the rest and add "PoliteReach tools are stale, reconnect the connector" to the report.
 - ambiguous: do not mark. If li_bookings already records that event id, it is not news: skip it. Otherwise list under NEEDS CHECK with the candidates.
 - none: ignore, unless the attendee gave only one name, then list under NEEDS CHECK.
@@ -65,14 +66,21 @@ li_bookings from 7 days ago onward. Get each event from the calendar.
 - Start time changed: li_mark_booked with the same event id and the new time.
 
 STEP 3: NUDGE OR CLOSE
-li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded. If one of my one-off scheduled tasks already handles a person (their name is in it), leave them to it. For each row read the thread it carries; if it does not show their agreement and everything after it, read li_conversation_history. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
+li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded. If a follow-up chain is active for a person (li_list_chains, one call), leave them to it. For each row read the thread it carries; if it does not show their agreement and everything after it, read li_conversation_history. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
 - nudge: one line pointing back to what they said about the call. Never propose a time, never pitch. The link: if a message of ours after their last message already has it, point to it ("can you grab a slot from the link above?") and never paste it again. Only when it is not there, put my booking link on its own second line.
 - close: one line, no link: "Should I close this off, or still want a slot this week?" in the tone of the thread.
 Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Greet with the row's firstName (already case-fixed); never write a name in all capitals. Write the plain booking link with no full stop after it; never add ?name= or any parameter (PoliteReach adds their name), never a short link.
 Right before sending, search the calendar again for each row by full name (then first name + company); anyone who booked since step 1 gets li_mark_booked and no message. Send with li_send_reply, confirmSend true, calendarChecked true, naming no account: each goes from the account its booking is on. bookingNudge true for nudges, bookingClose true for closes, one call for each (a batch cannot mix them). If a row is refused, drop it, resend the rest once, and never retry that person. A returned job id means queued.
 If the thread shows they already booked, mark booked instead. If they changed their mind, skip and list under NEEDS CHECK.
 
+STEP 4: AFTER THE CALL
+li_bookings with status booked, from 7 days ago to now: calls whose start has passed. Skip anyone already given no_show, call_done or a later stage (li_contact_dossier shows it).
+- Gone or cancelled on the calendar: step 2 handles it.
+- The calendar or booking tool marks them a no-show: li_set_stage no_show, source routine, a note naming where it was marked. Then write the no_show chain from my skill's references/stage-templates.md for this person (every word written now) under PROPOSED CHAINS.
+- Otherwise list the call under HOW DID IT GO with name, company and time, so I can say no_show, or call_done with what was agreed, the next step, the owner and a date. Never guess a no-show or a call done.
+Never create a chain in this run: I approve each one in chat, then it is created with li_create_followup_chain and confirmChain true.
+
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 
-REPORT: booked (only new or changed this run), cancelled or moved, nudged and closed (each message in a code block), NEEDS CHECK. Nothing happened: "No booking actions." and no notification. Otherwise notify me once with the counts and one line per NEEDS CHECK item. If a NEEDS CHECK booking did not come from LinkedIn, I can tell you and you mark it with li_ignore_calendar_event.
+REPORT: booked (only new or changed this run), cancelled or moved, nudged and closed (each message in a code block), HOW DID IT GO, PROPOSED CHAINS, NEEDS CHECK. Nothing happened: "No booking actions." and no notification. Otherwise notify me once with the counts and one line per HOW DID IT GO and NEEDS CHECK item. If a NEEDS CHECK booking did not come from LinkedIn, I can tell you and you mark it with li_ignore_calendar_event.
 ```

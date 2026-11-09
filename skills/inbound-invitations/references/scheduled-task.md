@@ -6,7 +6,7 @@ Create nothing until the user has answered part 1.
 
 The task writes with the user's outreach skill, named "(company)-politereach-skill". Find it among their skills first. If theirs has another name, ask which one it is and use that name. If they have none, offer to build it first (the `outreach-skill-builder` skill, or `li_setup_guide` step `outreach_skill`) and stop.
 
-Ask in one message, numbered, defaults in brackets. If their PoliteReach skill already answers one, say what you took from it. Ask their timezone if unknown.
+If this app has a tool for asking a question with options to pick, ask each question with it (the default first; the user can always type their own answer). Otherwise ask in one message, numbered, defaults in brackets. If their PoliteReach skill already answers one, say what you took from it. Ask their timezone if unknown.
 
 1. Which PoliteReach accounts should it cover? Use the names from `li_list_accounts`. [all of them]
 2. Who should it accept, and who never? [the ICPs and the never-contact list in your skill]

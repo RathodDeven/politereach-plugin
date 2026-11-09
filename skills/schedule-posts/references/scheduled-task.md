@@ -6,7 +6,7 @@ The task writes with the user's outreach skill, named "(company)-politereach-ski
 
 ## Part 1: ask first
 
-Ask in one message, numbered, defaults in brackets, so the user can answer "defaults" or change only some. If their skill already answers one, say what you took from it instead of asking. Ask their timezone if unknown.
+If this app has a tool for asking a question with options to pick, ask each question with it (the default first; the user can always type their own answer). Otherwise ask in one message, numbered, defaults in brackets, so the user can answer "defaults" or change only some. If their skill already answers one, say what you took from it instead of asking. Ask their timezone if unknown.
 
 1. Which PoliteReach accounts should it cover? Use the names from `li_list_accounts`. [all of them]
 2. Which account posts on which weekday? [one post per weekday, your accounts taking turns]

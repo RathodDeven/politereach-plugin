@@ -7,7 +7,7 @@ description: Connect PoliteReach to the user's AI assistant and to a LinkedIn ac
 
 PoliteReach sends from the user's OWN LinkedIn accounts. You (the assistant) decide and write; PoliteReach's server does the LinkedIn work. Its tools are named `li_*`.
 
-The user wants everything set up in one go (account, outreach skill, then routines): follow `references/setup-sequence.md`, which starts with the steps below.
+The user wants everything set up in one go (account, outreach skill, then routines): follow `references/setup-sequence.md`, which starts with the steps below. Its "How to ask" rules apply to every question here too: options to pick when the app can show them, and answers you already know prefilled for the user to confirm.
 
 ## 1. Check the connector
 
@@ -37,7 +37,7 @@ Call `li_list_accounts`.
 ## 4. Optional settings (only when the user asks)
 
 - Sending hours: `li_set_office_hours`. They hold invites and scheduled messages only, never a message the user sends now. `end` is exclusive (20 means up to 19:59). Prospects spread over timezones: `sendWindowMode: "prospect"` sends in each person's local hours (suggested: invites 8-11, messages 8-18); people with no known timezone use the account's hours. One market: convert that market's morning into the account's local hours and change only `start` and `end`. Never set the account's `timezone` to the prospects' zone: it is also the browser's timezone.
-- Booking link: `li_set_booking_settings` with `bookingUrls`. PoliteReach adds each recipient's name to the link itself.
+- Booking link: `li_set_booking_settings` with `bookingUrls`. PoliteReach adds each recipient's name to the link itself. The follow-up pace is `nudgeScheduleDays` [2, 5, 10]: days after each message of ours, the last one the close (a nudge after 2 days, another 5 days later, a close 10 days after that).
 - Invite cleanup: `li_set_auto_withdraw`. Explain first: a withdrawn invite blocks re-inviting that person for about three weeks and cannot be undone. Turn it on only on a clear yes.
 
 ## When something looks stuck
@@ -52,4 +52,5 @@ Call `li_list_accounts`.
 
 1. Build the user's outreach skill: the `outreach-skill-builder` skill.
 2. Start outreach to people: the `start-outreach` skill.
-3. What else PoliteReach does, and what to connect for it (a calendar for booking checks, scheduled tasks for routines): the `using-politereach` skill.
+3. Keep warm leads moving after a reply, a call or a proposal: the `keep-warm-leads` skill.
+4. What else PoliteReach does, and what to connect for it (a calendar for booking checks, scheduled tasks for routines): the `using-politereach` skill.

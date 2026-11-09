@@ -34,7 +34,7 @@ Read the full thread before judging: `li_conversation_history`. Only if nothing 
 
 Before drafting, check the sending account's `plan` in `li_list_accounts`: a lapsed or ending trial may refuse the send.
 
-Show every draft. On a yes, search the calendar once more for anyone with `bookingCheckRequired` and drop whoever booked meanwhile. Then one `li_send_reply` with `replies: [{profileUrl, message}, ...]`, `confirmSend: true`, and `calendarChecked: true` when the batch holds a checked booking row. Each reply goes from the account the conversation is on. A `jobId` means queued, not failed. Never send twice to the same person; check with one `li_job_result` call (no jobId).
+Show every draft. On a yes, search the calendar once more for anyone with `bookingCheckRequired` and drop whoever booked meanwhile. Then one `li_send_reply` with `replies: [{profileUrl, message}, ...]`, `confirmSend: true`, and `calendarChecked: true` when the batch holds a checked booking row. Each reply goes from the account the conversation is on. A `jobId` means queued, not failed. Never send twice to the same person; check with one `li_job_result` call (no jobId). A refusal saying the identical text already went to them in the last 10 minutes means it was sent: check the thread, never resend. `force: true` only when the user explicitly wants the same text twice.
 
 ## 4. Record a verdict for every thread read
 
@@ -55,12 +55,14 @@ Other marks:
 - "Try again in (month)": `li_snooze_reply` with `until`. Nothing is sent when it expires.
 - A thread not worth a verdict on the person: `li_mark_reviewed` with `conversationUrn`, `lastMessageAt` (the row's `lastActivityAt`), `decision` (e.g. `skip`, `vendor_pitch`, `no_action`) and `sessionLabel`.
 - Flagged threads: mark nothing.
+- Where the deal now stands (a call done, a proposal out, a trial started): `li_set_stage` with `profileUrls` and the stage; `call_done` takes `note`, `nextStep`, `owner` and `dueDate`. Then offer that stage's chain.
+- The conversation moved to email, WhatsApp or a call: `li_set_contact_email` when they give an address, and `li_log_touch` for each touch off LinkedIn (`direction: "in"` for theirs stops their chains and campaign follow-ups).
 
 A marked conversation reopens by itself if they write again.
 
 ## Warm threads: book the next touch
 
-A thread with no sequence left (they replied, a call happened, a proposal went out, you wait on them) has nothing scheduled, so it gets forgotten. When the next move is to wait, offer a one-time scheduled follow-up for that person, about 7 days out unless the user names a date. Follow `references/follow-up-task.md`.
+A thread with no sequence left (they replied, a call happened, a proposal went out, you wait on them) has nothing scheduled, so it gets forgotten. When the next move is to wait, offer a follow-up chain for that person: the next 1-4 touches, written now, sent or drafted when due, stopped by itself the moment they write. Follow `references/follow-up-task.md`; the whole warm-lead workflow is the `keep-warm-leads` skill.
 
 ## Message rules
 

@@ -66,7 +66,7 @@ Then install **PoliteReach** from the plugin list and sign in. Codex reads `.age
 
 **What the skills do there.** The skills are the same as in Claude. They work the same way once the PoliteReach tools are connected. The skill table below applies to every app. Two notes:
 
-- The four routine skills (`answer-replies`, `inbound-invitations`, `book-agreed-calls`, `schedule-posts`) ask your app to create a recurring scheduled task. If your app cannot schedule tasks, run them by hand.
+- The five routine skills (`answer-replies`, `inbound-invitations`, `book-agreed-calls`, `schedule-posts`, `keep-warm-leads`) ask your app to create a recurring scheduled task. If your app cannot schedule tasks, run them by hand.
 - `book-agreed-calls` needs a calendar connector in the same app (Google Calendar, or Microsoft 365 / Outlook calendar) with its list-events and get-event tools allowed. Without it, it records who agreed but cannot tell who booked, so it sends no nudges.
 
 ## Skills
@@ -79,7 +79,8 @@ Then install **PoliteReach** from the plugin list and sign in. Codex reads `.age
 | `start-outreach` | From LinkedIn profile links: looks each person up, researches what is missing, matches an ICP, writes the whole sequence, stages it for your review and launches on your yes. |
 | `answer-replies` | Finds every reply waiting on you, drafts answers, sends the ones you approve, and records how each conversation went. Can run on a schedule. |
 | `inbound-invitations` | Screens the invitations people sent you, accepts the ones that fit, and starts a short sequence for them. Can run on a schedule. |
-| `book-agreed-calls` | Tracks who agreed to a call, matches bookings on your calendar, and sends one nudge and one polite close. Can run on a schedule. |
+| `book-agreed-calls` | Tracks who agreed to a call, matches bookings on your calendar, and follows up on the pace you set (nudges, then one polite close). Can run on a schedule. |
+| `keep-warm-leads` | Plans the next few touches for warm people (agreed, no-show, call done, proposal sent), records where each deal stands, logs email, WhatsApp and call touches, and works the daily list of who is due. Can run on a schedule. |
 | `schedule-posts` | Writes posts in your voice and schedules or publishes them on your accounts. Can run on a schedule. |
 | `pipeline-check` | Daily digest, campaign progress, who accepted and what goes out next, pending invites, outcomes, and your do-not-contact list. |
 | `queued-messages` | Shows what goes out soon and fixes or holds queued wording before it is sent. |

@@ -1,6 +1,6 @@
 ---
 name: book-agreed-calls
-description: Make sure LinkedIn prospects who agreed to a call actually book it. Records who agreed, matches calendar bookings to prospects, notices cancelled or moved calls, and sends one nudge then one polite close through PoliteReach. Use when the user asks who agreed to a call, who booked, whether someone booked, to follow up on a booking link, or to put booking follow-up on a schedule.
+description: Make sure LinkedIn prospects who agreed to a call actually book it. Records who agreed, matches calendar bookings to prospects, notices cancelled or moved calls, sends nudges on the user's schedule (by default two, then a polite close) through PoliteReach, and after the call records whether it happened (no-show or call done) and offers the next follow-ups. Use when the user asks who agreed to a call, who booked, whether someone booked, to follow up on a booking link, how a call went or who did not show up, or to put booking follow-up on a schedule.
 ---
 
 # Get agreed calls booked
@@ -34,7 +34,7 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 
 1. **Find bookings.** On the calendar the bookings land on, list events from 7 days ago to 30 days ahead. Keep booking-tool events (cal.com, Calendly, or the user's booking link in the organiser, description, location or title). Ignore meetings with only the user's own team.
 2. **Match.** One `li_match_contacts` call with every external attendee: `name`, `email`, `eventId`, `startsAt`, `createdAt`, and the full `description`.
-   - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`. Safe to repeat; a reply with `unchanged: true` was already recorded, so it is not news.
+   - `match`: `li_mark_booked` with `calendarEventId` and `meetingStart`. A booked call is `meeting_booked`, never `won`. Safe to repeat; a reply with `unchanged: true` was already recorded, so it is not news. The attendee's email is theirs: `li_set_contact_email` with it (skip the user's own team).
    - The tool refuses `createdAt` or `description`: the connector's tool list is stale. Pass the other fields and tell the user to reconnect PoliteReach.
    - `ambiguous`: mark nobody; list the candidates for the user.
    - `none`: ignore, unless the attendee gave only one name; then list it for the user. When the user says it is not from LinkedIn: `li_ignore_calendar_event` with its `eventId` (or their `email` for every booking by them).
@@ -45,21 +45,38 @@ No calendar tools loaded: say so with the message above and stop after part A. N
 
 ## C. Nudge or close (only after part B ran)
 
-1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded. Drop rows from accounts the user did not ask you to cover.
+1. `li_booking_due` (all accounts at once). Read `truncated` and `excluded`; never contact anyone excluded. `excluded.wroteSince` are people owed an answer: a LinkedIn reply is in `li_replies_to_answer`, one by email or a call (`li_log_touch` in) is in `li_warm_due` as `they_wrote_last`. Drop rows from accounts the user did not ask you to cover.
 2. Per row, from the messages it carries (`thread`):
    - `bookingLinkSentAt` is null: the link never went out. Send it with one line, not a reminder about it.
    - `nudge`: one line pointing back to what they said about the call ("you mentioned thursday for a call"). If a message of ours after their last one already has the link, point to it ("can you grab a slot from the link above?") and never paste it again; otherwise the plain booking link on its own line, no full stop after it. Never add `?name=` or any parameter (PoliteReach adds their name), never a short or redirect link. Never propose a time, never pitch.
    - `close`: one line, no link, e.g. "Should I close this off, or still want a slot this week?" in the tone of the thread.
    - Max two short lines, no exclamation marks, no emojis, no "just checking in".
    - Greet with the row's `firstName` (already case-fixed). A name typed from elsewhere in all capitals or all lowercase gets normal capitals; a mixed-case one ("McDonald") stays as written.
-3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user.
+3. If the thread shows they already booked, mark booked instead. If they changed their mind, skip and tell the user. If a follow-up chain is active for them (`li_list_chains`), leave them to it.
 4. Right before sending, search the calendar once more for each person (full name, then first name + company): people book minutes after they are listed. Booked → `li_mark_booked`, send nothing.
 5. Send from no named account: each nudge or close goes from the account its booking row is on (`accountId`), even when the person is on another account too.
 6. Show the drafts. On a yes (or under a scheduled task's send mode): `li_send_reply` with `confirmSend: true`, `calendarChecked: true` and `replies`, `bookingNudge: true` for nudges, a separate call with `bookingClose: true` for closes. A refusal names its reason: relay it, never work around it, never retry that person; resend the other rows once. A batch cannot mix nudges and closes. A returned job id means queued.
 
+## D. After the call (needs the calendar connector)
+
+1. `li_bookings` with `status: "booked"`, from 7 days ago to now: calls whose start has passed. Skip anyone already given `no_show`, `call_done` or a later stage (`li_contact_dossier` shows it).
+2. Per call:
+   - Gone or cancelled on the calendar: part B, `li_mark_booking_cancelled`.
+   - The calendar or booking tool marks them a no-show (Calendly and Cal.com can): `li_set_stage` `no_show` (`source: "routine"` in a scheduled task).
+   - Otherwise ask the user how it went: `no_show`, or `call_done` with `note` (what was agreed), `nextStep`, `owner` and `dueDate` (YYYY-MM-DD). Set it with `li_set_stage`.
+3. Offer that stage's chain from the user's outreach skill (`references/stage-templates.md`), written for this person: `li_create_followup_chain`, preview, then `confirmChain: true` on their yes. The `keep-warm-leads` skill has the rules.
+4. A deal agreed on the call is `li_mark_outcome` `won`; the call alone is never `won`.
+
 ## Settings
 
-Booking links and limits are per account: `li_set_booking_settings` (`bookingUrls`, `maxNudges`, `closeAfterDays`, `firstNudgeHours`, `cancelRecheckHours`, `prefillName`). Current values are in `li_list_accounts` (`booking`).
+Per account: `li_set_booking_settings`. Current values are in `li_list_accounts` (`booking`).
+
+- `bookingUrls`: the booking links this account sends. Any outgoing message holding one marks the link as sent.
+- `nudgeScheduleDays` [2, 5, 10]: each number is days after OUR previous message (the link, then each nudge). The last one is the close; the rest are nudges. [2, 5, 10] = a nudge 2 days after the link, another 5 days after that, a close 10 days after the second nudge. 1 to 4 numbers, each 1 to 30, never shrinking. [3] = no nudge, a close after 3 days. When they named a day for the call, the first check is never later than 09:00 their time the day before.
+- `cancelRecheckHours`: how long after a cancelled call to check again.
+- `prefillName`: PoliteReach adds the recipient's name to the link. Write the plain link.
+
+`maxNudges`, `closeAfterDays` and `firstNudgeHours` are gone: `nudgeScheduleDays` replaces all three.
 
 ## Put it on a schedule
 

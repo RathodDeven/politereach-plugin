@@ -1,6 +1,6 @@
 ---
 name: using-politereach
-description: Overview of PoliteReach, the LinkedIn outreach connector. Says what must be connected for each job (the PoliteReach connector, a LinkedIn account, a calendar for bookings, scheduled tasks for routines), which PoliteReach skill handles which job, and what every li_* tool does with its safety rule. Use when the user asks what PoliteReach can do, how to use it, what they need to connect or set up, which tool or skill to use, why something needs a calendar or a subscription, or makes any PoliteReach request that no other PoliteReach skill covers.
+description: Overview of PoliteReach, the LinkedIn outreach connector. Says what must be connected for each job (the PoliteReach connector, a LinkedIn account, a calendar for bookings, an email connector for email follow-ups, scheduled tasks for routines), which PoliteReach skill handles which job, and what every li_* tool does with its safety rule. Use when the user asks what PoliteReach can do, how to use it, what they need to connect or set up, which tool or skill to use, why something needs a calendar or a subscription, or makes any PoliteReach request that no other PoliteReach skill covers.
 ---
 
 # Using PoliteReach
@@ -16,20 +16,22 @@ PoliteReach sends LinkedIn outreach from the user's OWN LinkedIn accounts. You (
 | Sending, research, posting | A plan that covers the account (trial or paid) | Relay the refusal as it is. If it carries a link, give that link unchanged; never invent one |
 | Research (`li_research_profiles`, `li_enrich_profiles`, `li_enrich_company`) | Lookups left in the research allowance (shared across the owner's accounts) | `li_research_profiles` with `estimateOnly` first. Out of lookups: say so; `li_contact_dossier` still reads stored research for free |
 | Booking check (who booked), and the nudges that depend on it | A calendar connector in the SAME app: Google Calendar, or Microsoft 365 / Outlook calendar (a Calendly or Cal.com connector that lists bookings also works). Its list-events and get-event tools must be allowed | Tell the user to connect their calendar in the app's connector settings. Until then, record who agreed but say you cannot tell who booked, and send no nudges. Never guess |
-| Booking nudges | The account's booking link, set with `li_set_booking_settings` (`bookingUrls`) | Ask for the link and set it on a yes. Without it no link is noticed as sent |
+| Booking nudges | The account's booking link, set with `li_set_booking_settings` (`bookingUrls`; the pace is `nudgeScheduleDays`) | Ask for the link and set it on a yes. Without it no link is noticed as sent |
+| Warm follow-ups (chains, stages, the warm queue) | Nothing beyond the connector. An email connector in the same app (Gmail, Outlook…) only for email steps | No email connector: email steps come to the user as text to send themselves, then `li_log_touch`. Never suggest one to a user who follows up on LinkedIn only |
 | Routines that run on their own | The app's scheduled-tasks feature (claude.ai and Cowork: **Scheduled**; Claude Code: `/schedule`; ChatGPT: tasks), with the tools set to always allow | Run the routine by hand when the user asks |
 | Writing in the user's voice | The user's own outreach skill | The `outreach-skill-builder` skill |
 
-PoliteReach itself never connects to a calendar or a mailbox. You read those through the user's own connectors and send PoliteReach only what is needed (attendee name, email, event id, times, description).
+PoliteReach itself never connects to a calendar or a mailbox, and never sends email. You read and send those through the user's own connectors and tell PoliteReach only what is needed (attendee name, email, event id, times, description; an email touch with `li_log_touch`).
 
 ## Which skill for which job
 
 - Set up, connect or reconnect, account health: `get-started`. Everything in one go (account, outreach skill, routines): its `references/setup-sequence.md`.
 - Build the user's voice, ICPs and offers: `outreach-skill-builder`.
 - Reach out to people from LinkedIn links, or split a list into test arms: `start-outreach`.
-- Replies waiting on the user, outcomes, a one-time follow-up for a warm thread: `answer-replies`.
+- Replies waiting on the user, outcomes, the next touches for one warm thread: `answer-replies`.
+- Warm leads after a reply, a call or a proposal: follow-up chains, deal stages, email and call touches, the daily warm queue: `keep-warm-leads`.
 - Invitations people sent the user: `inbound-invitations`.
-- Who agreed to a call, who booked, nudges: `book-agreed-calls`.
+- Who agreed to a call, who booked, nudges, how a call went: `book-agreed-calls`.
 - Posts now or later, a content calendar: `schedule-posts`.
 - How things are going, pending invites, do-not-contact: `pipeline-check`.
 - What goes out soon, fixing queued wording: `queued-messages`.
@@ -41,7 +43,7 @@ Load the matching skill and follow it. Use the tool map below only for jobs none
 Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or member id from `li_list_accounts`). "Preview until" a flag means the call is a dry run until that flag is true. Plan and lookups left are in `li_list_accounts` (`plan`, `enrichment`).
 
 **Setup**
-- `li_setup_guide`: the same setup and routine instructions these skills carry, served by the connector, so an assistant without the plugin can follow them too. No `step` = the whole sequence; `account`, `outreach_skill`, `replies`, `invitations`, `bookings`, `posts`, `follow_up`, `start_outreach` = one part. Either the skill or this tool is fine.
+- `li_setup_guide`: the same setup and routine instructions these skills carry, served by the connector, so an assistant without the plugin can follow them too. No `step` = the whole sequence; `account`, `outreach_skill`, `replies`, `invitations`, `bookings`, `posts`, `warm`, `follow_up`, `start_outreach` = one part. Either the skill or this tool is fine.
 
 **Accounts and health**
 - `li_list_accounts`: every account with tier, invite pace, hours, booking settings, plan, research allowance, invite notes this month (`inviteNotes`) and any hold on new invites (`inviteHold`: LinkedIn's weekly limit `WEEKLY_LIMIT`, the invite breaker, or `UNREADABLE`). `invitePace.weeklyCap` is the enforced ceiling; `learnedWeeklyCap`/`learnedAt` (null unless it binds) = lowered after LinkedIn's own weekly-limit refusal, only ever lower, climbing about 10% a week after 2 weeks (our policy). `autoWithdraw.lastRun` is the last cleanup run. Start here.
@@ -86,6 +88,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_send_reply`: answer one or many people (`replies`), each from the account the thread is on. Preview until `confirmSend`. Rows with `bookingCheckRequired` need a calendar search first, then `calendarChecked: true` (booked = send nothing, `li_mark_booked`). A job id means queued; never send twice.
 - `li_send_message`: one message that waits for the result. Preview until `confirmSend`.
 - `li_send_bulk_messages`: many messages from one account in one run. Preview until `confirmSend`; batches of 15 or fewer.
+- All three refuse the identical text to the same person within 10 minutes: the refusal says when it went or was queued, so check the thread or `li_job_result`, never resend. `force: true` skips only that check, and only when the user explicitly wants the same text twice.
 
 **Inbox and conversations**
 - `li_replies_to_answer`: campaign people who replied; `includeThread: true` attaches the thread and a `suggestedOutcome` (a not_interested suggestion from a clear opt-out, never written: read the message first).
@@ -122,8 +125,17 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_mark_booking_cancelled`: the event is gone or cancelled.
 - `li_bookings`: booked calls to compare with the calendar.
 - `li_booking_due`: who is due a nudge or a close. Never contact anyone in `excluded`. `firstName`/`lastName` already come case-fixed.
-- `li_set_booking_settings`: booking links, nudge count, close delay, name prefill.
+- `li_set_booking_settings`: booking links (`bookingUrls`), the follow-up pace (`nudgeScheduleDays`, default [2, 5, 10]: days after each message of ours, the last one the close; 1-4 numbers, 1-30, never shrinking), `cancelRecheckHours`, name prefill. The old `maxNudges`, `closeAfterDays` and `firstNudgeHours` are refused.
 - Nudges and closes go out only through `li_send_reply` with `bookingNudge` or `bookingClose`.
+
+**Warm follow-up** (you write every word; PoliteReach holds the plan, the timing and the stop rules)
+- `li_create_followup_chain`: the next 1-4 touches for ONE person from ONE account (`steps`: `delayDays` 1-60 after our previous message, strictly growing; `channel` `linkedin` or `email`; `text`; `mode` `send` or `draft`). Email is always a draft. Preview until `confirmChain`. One active chain per person per account; `replaceExisting` replaces it. Stops by itself when they write on any channel, book a call, get a verdict or are suppressed.
+- `li_list_chains`: chains by person or account; `status` `active` (default), `completed`, `canceled` or `all`.
+- `li_cancel_chain`: stop one (`chainId`, or `profileUrl` + `sessionLabel`) with a short `reason`.
+- `li_set_stage`: where the deal stands, for `profileUrls`: `agreed`, `booked`, `no_show`, `call_done` (with `note`, `nextStep`, `owner`, `dueDate`), `proposal_sent`, `invited_not_activated`, `trial`, `paid`, `closed`, or null to clear. Not a verdict.
+- `li_set_contact_email`: save a person's email address.
+- `li_log_touch`: an email, WhatsApp, call or other touch (`direction` `in` or `out`, `at`, `note`). An inbound one stops their chains, campaign follow-ups and booking nudges.
+- `li_warm_due`: the warm leads whose next touch is due, most overdue first, each with `reasons` (`chain_step_due`, `next_step_date`, `they_wrote_last`, `quiet`), the due step's text, last touch per channel, and `unreadStreak` (no read receipt on our last messages: never call it unread). Read `truncated`; unreadable is not empty.
 
 **Posts**
 - `li_schedule_post`: post at an exact time the user chose. Cancellable until it goes out. `accountHold` in the reply = that account cannot post now; relay its link.
@@ -154,7 +166,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.
 - In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then follows about a day later, in the person's own morning window (or the account's sending hours; 18-30 hours with no window to aim at).
 
-Operator only, not for normal use: `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
+Operator only, not for normal use: `li_trial_watch` (trials and paid grace ending soon, accounts stuck on a sign-in or security check, users who never launched a campaign, invited users who never connected LinkedIn; read-only), `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
 
 ## Ground rules, everywhere
 

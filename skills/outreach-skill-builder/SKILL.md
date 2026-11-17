@@ -42,14 +42,21 @@ Show those answers filled in, each marked with where it came from ("from your we
 12. Cadence. Default: three messages, the first the day after they accept, a follow-up on day 5, a close on day 12. For people who invited the user: day 2, 7 and 14. Four messages is the most PoliteReach sends.
 13. Booking follow-up pace: days after each message of ours, the last one the close. [2, 5, 10: a nudge 2 days after the link, another 5 days later, a close 10 days after that]
 
-**Round 4, warm follow-ups**
-14. Their default next touches per deal stage, used when a warm lead goes quiet. Offer these defaults; they confirm, change or drop each. Every step: days after our previous message (gaps grow), LinkedIn or email, sent by itself or drafted for them. [drafted for them]
-    - `agreed`: the booking nudges cover the first weeks; after the close, one check-in [30 days].
-    - `no_show`: a no-worries line with the link to pick a new time, one new reason, a close [1, 4, 10 days].
-    - `call_done`: a recap with the agreed next step, one new reason or resource, a close [1, 5, 12 days; email when they gave an address].
-    - `proposal_sent`: any questions on it, one proof point, a close [3, 7, 14 days].
-    - `trial`: how setup is going with one tip, the one feature that matters to them, a note before the trial ends [2, 5, 10 days].
-    - `invited_not_activated`: only if they sell a product people sign up for: the one step to get started, an offer to set it up together, a close [2, 5, 10 days].
+**Round 4, follow-ups**
+
+Every step: days after our previous message (gaps grow), LinkedIn or email, sent by itself or drafted for them. Offer these defaults; they confirm, change or drop each. The close everywhere, unless they word it their way: "Should I close this off? If it's not a fit right now, mind sharing what's holding you back?"
+
+14. Follow-up after our reply: a chain starts after every reply of ours that leaves the thread open (someone who agrees to a call goes to the booking follow-up instead). [sent by itself]
+    - We answered a question or pushed the call, no yes yet: did that answer it plus the one next step (point back to the link if it is in the thread, never paste it again), one new useful thing not yet in the thread (a proof point or product fact) plus the ask, the close [gaps 3, 4, 7: days 3, 7 and 14 after our reply].
+    - We sent what they asked for (a demo video, a case study, information): did you get a chance to look, the ask for a call, the close [gaps 2, 4, 7: days 2, 6 and 13].
+    - They said "will do", "let me check with the team" or "I'll get back to you": a light check, the close [gaps 5, 7: days 5 and 12].
+15. Their next touches per deal stage:
+    - `agreed`: the booking nudges cover the first weeks; after the close, one check-in [30 days, drafted for them].
+    - `no_show`: an offer to rebook (a no-worries line with the link), a close [gaps 1, 4: days 1 and 5, sent by itself].
+    - `call_done`: a recap with the agreed next step, one new reason or resource, a close [1, 5, 12 days, drafted for them; email when they gave an address].
+    - `proposal_sent`: any questions on it, one proof point, a close [3, 7, 14 days, drafted for them].
+    - `trial`: how setup is going with one tip, the one feature that matters to them, a note before the trial ends [2, 5, 10 days, sent by itself].
+    - `invited_not_activated`: only if they sell a product people sign up for: the one step to get started, an offer to set it up together, a close [2, 5, 10 days, sent by itself].
 
 ## Part 2: build it
 
@@ -59,7 +66,7 @@ Name it "(company)-politereach-skill": the company name in lowercase, words join
 - `references/company.md`: offers, proof, links, pricing that may be quoted, the booking link and pace, and which calendar and booking tool the bookings use (routines read it from here).
 - `references/icps.md`: an ordered table of signals (first match wins) with the tie-break, then per ICP: how to spot them, seniority, their pain, the offer, the proof, who is NOT this ICP, the account that writes to them, and their first message, follow-ups and close.
 - `references/writing.md`: voice, banned words, message rules.
-- `references/stage-templates.md`: from answer 14, per stage: when it applies, then each step (days, channel, send or draft, and what it says, with the slots to fill from the thread in parentheses). A chain is always written out for the person before it is created; a slot never reaches PoliteReach unfilled.
+- `references/stage-templates.md`: first a "Follow-up after our reply" section from answer 14, per situation; then per stage from answer 15. Each: when it applies, then each step (days, channel, send or draft, and a sample line in the user's voice from round 2, with the slots to fill from the thread in parentheses). These are defaults the user edits here; every PoliteReach routine follows this file over its own defaults. A chain is always written out for the person before it is created; a slot never reaches PoliteReach unfilled.
 - `references/objections.md`: per objection, what they say, what it really means, and the one line or question that moves it. Plus a step-down ladder (after a no, one other offer per reply, never one they already heard) and a graceful close.
 - `references/learned-preferences.md`: empty to start, with a changelog.
 
@@ -74,7 +81,7 @@ Keep ICP definitions inside the skill. PoliteReach stores only an ICP's name and
 5. Write the whole sequence at once: a connection note, a first message, then the follow-ups and close the cadence has. Write the note only when the account sends notes (`inviteNotes`: a free account drops notes, and Premium notes can run out for the month); otherwise write none and say so. At most four messages, three by default; the note is on top of those, so never write a fifth. You may pick ONE recent post of theirs to like before the invite (`engagePostUrl`), but never write a message that only works if they saw the like.
 6. Preview with `li_ingest_prospects` (`confirmIngest: false`) and show every word, the account and the campaign. Run `li_list_campaigns` first. Import into the standing campaign by `campaignId` (one per account and offer, never one per batch or per day) only when the user's yes covers sending now: it is live, so the import sends. Otherwise use a new campaign that is not launched. Every row names `strategyName`, `icpName` and the account, and carries location, an IANA timezone and what you learned (`whyTheyFit`, `whatTheySell`, `context`), so the next lookup reuses it. Someone the user is already connected to starts at `startStage: "message"`.
 7. On the user's yes, stage with `confirmIngest: true` and `launch: false`. Nothing goes out without the user's yes. `launch: false` holds nothing in a campaign that is already live: there the import sends, so say so before, and check each row's first send time after. For more than ten people, tell the user the pace and roughly when the last invite goes out.
-8. A warm thread that went quiet, a call done, a proposal out: set the stage (`li_set_stage`) and offer that stage's chain from `stage-templates.md`, written for this person (`li_create_followup_chain`, preview, then `confirmChain: true` on a yes). It stops by itself if they write. Log email, WhatsApp and call touches with `li_log_touch`, and save an address they give with `li_set_contact_email`.
+8. After every reply that leaves the thread open, start the "Follow-up after our reply" chain from `stage-templates.md`, written for this person (`li_create_followup_chain`, preview, then `confirmChain: true` on a yes; check the row's `activeChain` first). A call done, a proposal out: set the stage (`li_set_stage`) and offer that stage's chain the same way. It stops by itself if they write, agree to a call or book. Report each chain on one line: name, account, step due dates. Log email, WhatsApp and call touches with `li_log_touch`, and save an address they give with `li_set_contact_email`.
 9. Apply a one-off correction straight away. When the user makes the same choice two or three times, or says "always", propose the exact change to `learned-preferences.md` and write it only on a yes. Edit the old rule in place instead of adding one that contradicts it. Whenever the skill changes, give the user the whole skill folder back, never only the changed file.
 10. Every few weeks, compare ICPs and strategies with `li_outreach_analytics` and `li_outcome_summary`. To test two versions of a message, `li_experiment_assign` splits people fairly.
 
@@ -85,12 +92,12 @@ Keep ICP definitions inside the skill. PoliteReach stores only an ICP's name and
 - A post of theirs is mentioned by its topic in a few words and a short true reaction, never its numbers or claims.
 - Sell the problem, not the service. The first message offers one named thing they can say yes or no to; the call ask starts at the first follow-up or their first positive reply. Never end on "let me know".
 - No link in the first message. Each follow-up brings one new reason (a proof point, a resource), never a bump.
-- The close is a yes or no: "Should I close this off, or (the thing they would still say yes to)?"
+- The close of a sequence is a yes or no: "Should I close this off, or (the thing they would still say yes to)?" A follow-up chain closes with the line in `stage-templates.md`.
 - Cold messages never mention limits, safety, reply rates or prices.
 - No em dashes, no exclamation marks, no AI words (leverage, streamline, delve, seamless), no "great question", no "just checking in" or "circling back".
 - Never invent a client, a number, a price or a date.
 - Check the exact text against these rules before showing or sending it.
-- Someone who agrees to a call: check the user's calendar first, people book within minutes. Not booked: send the plain booking link (PoliteReach adds their name) and record it with `li_track_booking`. A booked call is `meeting_booked`, never `won`.
+- Someone who agrees to a call: check the user's calendar first, people book within minutes. Not booked: send the plain booking link (PoliteReach adds their name) and record it with `li_track_booking`, which ends their follow-up chain: the booking follow-up owns them until they book or it closes them. A booked call is `meeting_booked`, never `won`.
 - Topics from answer 10 are drafted for the user, never sent: leave the thread in their queue with `li_mark_replied` and a note starting "ACTION NEEDED".
 
 Do not build anything that sets the sending pace. Invites drip inside a fixed daily band and weekly ceiling per account tier, and there is no setting for it.

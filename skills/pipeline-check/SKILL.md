@@ -1,6 +1,6 @@
 ---
 name: pipeline-check
-description: Answer where the user's LinkedIn outreach stands in PoliteReach. Use when the user asks how today went, how campaigns are doing, which of a list of people are already in which campaigns, who accepted and what goes out to them next, how many invites are pending, how results, outcomes or an A/B test look, or wants someone added to their do-not-contact list.
+description: Answer where the user's LinkedIn outreach stands in PoliteReach. Use when the user asks how today went, how campaigns are doing, which of a list of people are already in which campaigns, who accepted and what goes out to them next, who is being followed up and when, how many invites are pending, how results, outcomes or an A/B test look, or wants someone added to their do-not-contact list.
 ---
 
 # Where things stand
@@ -32,6 +32,12 @@ If a tool says PoliteReach could not reach its database, retry once, then report
 - Hold one message: `li_cancel_steps` (cannot be undone).
 - Stop the person entirely: `li_mark_stopped` (ends their sequence).
 Each only on the user's yes.
+
+## Who is being followed up, and by what?
+
+Every open thread has one owner: the booking follow-up for people who agreed to a call (`li_bookings` with `status: "agreed"`; `li_booking_due` for who is due), a follow-up chain for any other open thread waiting on them, the campaign sequence for people who never replied, a snooze for "not now". A final verdict, do-not-contact or a flagged thread has none.
+
+`li_list_chains` (default `active`, all accounts, or `profileUrl` / `sessionLabel`; read `truncated` and raise `limit`, max 200, until it is false): report each chain on one line: name, account, each step's due date (and `send` or `draft`). Rows in `li_replies_to_answer` and `li_list_conversations` carry the same `activeChain` (null = none); `activeChainUnreadable` / `activeChainLookupFailed` means the read failed, so ask `li_list_chains`, never report "no chain". To add or change one, use the `answer-replies` or `keep-warm-leads` skill.
 
 ## How many invites am I waiting on?
 

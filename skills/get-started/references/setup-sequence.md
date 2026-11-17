@@ -22,7 +22,7 @@ Every routine writes in the user's voice and judges fit against their ICPs, so t
 
 All optional. Offer the five in one question the user can answer with several picks (a multi-select when the ask-with-options tool allows it; otherwise one numbered line each, "which numbers?"):
 
-1. Replies: drafts answers by default, or sends the clear ones and flags the rest; works best with a calendar connected (default every 2 hours, 10:00 to 20:00).
+1. Replies: drafts answers by default, or sends the clear ones, starts the follow-ups for threads left open and flags the rest; works best with a calendar connected (default every 2 hours, 10:00 to 20:00).
 2. Invitations: shortlists the people who invited the user and fit an ICP by default, or accepts them and starts a short sequence (default 09:00).
 3. Bookings: checks who booked after agreeing to a call, then drafts the nudges and the close by default, or sends them; after a call, asks how it went. Needs a calendar connected in this app (default 11:20, 15:20 and 19:20).
 4. Posts: writes LinkedIn posts in the user's voice and shows drafts first by default, or schedules them (default planned Sunday and Wednesday).

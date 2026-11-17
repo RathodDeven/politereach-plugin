@@ -17,16 +17,17 @@ A campaign ends after its last message. Everything after that (a reply, a call, 
 
 A chain is the next 1-4 touches for ONE person from ONE account, inside or outside a campaign.
 
-**When to offer one:**
+**When to offer one:** a chain owns every open thread where we spoke last and wait on them (one owner per thread: the `answer-replies` skill has the full list).
+- After every reply of ours that leaves the thread open (the `answer-replies` skill starts these).
 - A warm thread went quiet and the next move is to wait on them.
 - After a call (`call_done`), a no-show, a proposal, a trial start.
 - After the booking follow-up closed with no booking, for a later check-in.
-- Not while a campaign sequence still runs for them, and not instead of booking nudges: someone who agreed to a call gets `li_track_booking` (the `book-agreed-calls` skill).
+- Not while a campaign sequence still runs for them, not for a snoozed thread (`li_snooze_reply`), and not instead of booking nudges: someone who agreed to a call gets `li_track_booking` (the `book-agreed-calls` skill), which ends their chain. `li_create_followup_chain` refuses anyone who agreed, and anyone booked unless `stage` is an after-call stage (`no_show`, `call_done`, `proposal_sent`, `invited_not_activated`, `trial`).
 
 **Writing the steps:**
-- Start from the stage's template in the user's outreach skill (`references/stage-templates.md`). No template: propose 2-3 steps.
+- Start from the user's outreach skill (`references/stage-templates.md`): its "Follow-up after our reply" section for an answered thread, the stage's template for a stage. None there: the defaults in the `answer-replies` skill (`references/follow-up-task.md`).
 - Write each step for THIS person from the thread: their words, what was agreed, the next step. Every slot filled now; PoliteReach never writes text at send time.
-- `delayDays` (1-60) = days after OUR previous message to them on any channel (LinkedIn or a logged touch), then after the previous step. Gaps strictly grow (for example 3, 7, 14). The last step is the close.
+- `delayDays` (1-60) = days after OUR previous message to them on any channel (LinkedIn or a logged touch), then after the previous step. Each number is a GAP from the message before, and gaps strictly grow (for example 3, 4, 7 lands on days 3, 7 and 14). The last step is the close.
 - Each step: `channel` (`linkedin` or `email`), `mode` (`send` or `draft`), `text`.
   - `send`: LinkedIn only. Goes out by itself when due, inside the account's sending hours. Never send it by hand.
   - `draft`: waits in the warm queue (`li_warm_due`) for a yes: the user's in chat, or a warm routine the user set to send mode (it sends a due LinkedIn draft step word for word, only while nothing new happened in the thread). Default for anything sensitive; tell the user a send-mode routine sends drafts too.
@@ -36,9 +37,9 @@ A chain is the next 1-4 touches for ONE person from ONE account, inside or outsi
 **Create it:**
 1. `li_create_followup_chain` with `profileUrl`, `sessionLabel` (the account the thread is on), `steps`, a short `label`, and `stage` when it comes from a stage template. It previews each step's due time.
 2. Show every step: text, channel, mode, due date. On the user's yes, call again with `confirmChain: true`.
-3. One active chain per person per account. A second is refused; replace only on the user's yes (`replaceExisting: true` cancels the old one).
+3. One active chain per person per account. A second is refused; replace it (`replaceExisting: true` cancels the old one) only when our new reply changes what it should say, on the user's yes or under a replies routine in send mode.
 
-**It stops by itself** when they write on any channel (the LinkedIn thread is also read live right before each send), a call is booked, a final verdict is recorded (`li_mark_outcome` `won`, `not_interested` or `no_outcome`; `interested` does not stop it), or they go on the do-not-contact list. A send that fails ends the chain (`send_failed`); it is never retried. Read chains with `li_list_chains` (default `active`); stop one with `li_cancel_chain` (`chainId`, or `profileUrl` + `sessionLabel`) and a short `reason`.
+**It stops by itself** when they write on any channel (the LinkedIn thread is also read live right before each send), they agree to a call (`li_track_booking`), a call is booked, the thread is snoozed with a date, a final verdict is recorded (`li_mark_outcome` `won`, `not_interested` or `no_outcome`; `interested` does not stop it), or they go on the do-not-contact list. A send that fails ends the chain (`send_failed`); it is never retried. Read chains with `li_list_chains` (default `active`) and report each on one line: name, account, step due dates; stop one with `li_cancel_chain` (`chainId`, or `profileUrl` + `sessionLabel`) and a short `reason`.
 
 ## 2. Stages
 

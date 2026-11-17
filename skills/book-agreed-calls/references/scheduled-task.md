@@ -66,7 +66,7 @@ li_bookings from 7 days ago onward. Get each event from the calendar.
 - Start time changed: li_mark_booked with the same event id and the new time.
 
 STEP 3: NUDGE OR CLOSE
-li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded. If a follow-up chain is active for a person (li_list_chains, one call), leave them to it. For each row read the thread it carries; if it does not show their agreement and everything after it, read li_conversation_history. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
+li_booking_due across my accounts. Drop rows from any account not in CONFIG. Read truncated and excluded; never contact anyone excluded (excluded.activeChain counts people a follow-up chain owns: leave them to it). For each row read the thread it carries; if it does not show their agreement and everything after it, read li_conversation_history. bookingLinkSentAt null means the link never went out: send it with one line instead of a nudge about it.
 - nudge: one line pointing back to what they said about the call. Never propose a time, never pitch. The link: if a message of ours after their last message already has it, point to it ("can you grab a slot from the link above?") and never paste it again. Only when it is not there, put my booking link on its own second line.
 - close: one line, no link: "Should I close this off, or still want a slot this week?" in the tone of the thread.
 Max 2 short lines, no exclamation marks, no emojis, no "just checking in". Greet with the row's firstName (already case-fixed); never write a name in all capitals. Write the plain booking link with no full stop after it; never add ?name= or any parameter (PoliteReach adds their name), never a short link.
@@ -76,9 +76,9 @@ If the thread shows they already booked, mark booked instead. If they changed th
 STEP 4: AFTER THE CALL
 li_bookings with status booked, from 7 days ago to now: calls whose start has passed. Skip anyone already given no_show, call_done or a later stage (li_contact_dossier shows it).
 - Gone or cancelled on the calendar: step 2 handles it.
-- The calendar or booking tool marks them a no-show: li_set_stage no_show, source routine, a note naming where it was marked. Then write the no_show chain from my skill's references/stage-templates.md for this person (every word written now) under PROPOSED CHAINS.
+- The calendar or booking tool marks them a no-show: li_set_stage no_show, source routine, a note naming where it was marked. Then write the no_show chain from my skill's references/stage-templates.md for this person (every word written now; if it has none: a rebook offer, then a close, delayDays 1 and 4, mode send) under PROPOSED CHAINS.
 - Otherwise list the call under HOW DID IT GO with name, company and time, so I can say no_show, or call_done with what was agreed, the next step, the owner and a date. Never guess a no-show or a call done.
-Never create a chain in this run: I approve each one in chat, then it is created with li_create_followup_chain and confirmChain true.
+Never create a chain in this run: I approve each one in chat, then it is created with li_create_followup_chain, stage set (no_show, call_done…), and confirmChain true.
 
 If any tool returns a security-check or sign-in error, stop work on that account and report it; never retry around it.
 

@@ -28,7 +28,7 @@ PoliteReach itself never connects to a calendar or a mailbox, and never sends em
 - Set up, connect or reconnect, account health: `get-started`. Everything in one go (account, outreach skill, routines): its `references/setup-sequence.md`.
 - Build the user's voice, ICPs and offers: `outreach-skill-builder`.
 - Reach out to people from LinkedIn links, or split a list into test arms: `start-outreach`.
-- Replies waiting on the user, outcomes, the next touches for one warm thread: `answer-replies`.
+- Replies waiting on the user, outcomes, the follow-up chain after each reply: `answer-replies`.
 - Warm leads after a reply, a call or a proposal: follow-up chains, deal stages, email and call touches, the daily warm queue: `keep-warm-leads`.
 - Invitations people sent the user: `inbound-invitations`.
 - Who agreed to a call, who booked, nudges, how a call went: `book-agreed-calls`.
@@ -37,6 +37,20 @@ PoliteReach itself never connects to a calendar or a mailbox, and never sends em
 - What goes out soon, fixing queued wording: `queued-messages`.
 
 Load the matching skill and follow it. Use the tool map below only for jobs none of them covers.
+
+## Who follows up on an open thread
+
+One owner at a time, so nobody is chased twice or forgotten:
+
+| Situation | Owner |
+|---|---|
+| Agreed to a call, not booked | The booking follow-up (`book-agreed-calls`): from `li_track_booking` until booked or closed. It alone nudges and closes |
+| Any other open thread where we spoke last and wait on them | A follow-up chain (`li_create_followup_chain`), started after every reply of ours that leaves the thread open |
+| Never replied | Their campaign sequence (stops on reply) |
+| "Not now, try in (month)" | `li_snooze_reply`, no chain |
+| Final verdict, do-not-contact, flagged for the user | Nobody |
+
+The server keeps it so: `li_track_booking`, a new `li_mark_booked` and a dated `li_snooze_reply` end the person's chains; `li_create_followup_chain` refuses people the booking follow-up owns; `li_booking_due` skips people a chain owns. The default chain shapes (which the user's outreach skill can override) are in the `answer-replies` skill. Report chains one line each: name, account, step due dates.
 
 ## Tool map
 
@@ -85,14 +99,14 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_mark_stopped`: end a person's sequence for good. Not a hold.
 
 **Sending**
-- `li_send_reply`: answer one or many people (`replies`), each from the account the thread is on. Preview until `confirmSend`. Rows with `bookingCheckRequired` need a calendar search first, then `calendarChecked: true` (booked = send nothing, `li_mark_booked`). A job id means queued; never send twice.
+- `li_send_reply`: answer one or many people (`replies`), each from the account the thread is on. Preview until `confirmSend`. A thread it leaves open then gets a follow-up chain. Rows with `bookingCheckRequired` need a calendar search first, then `calendarChecked: true` (booked = send nothing, `li_mark_booked`). A job id means queued; never send twice.
 - `li_send_message`: one message that waits for the result. Preview until `confirmSend`.
 - `li_send_bulk_messages`: many messages from one account in one run. Preview until `confirmSend`; batches of 15 or fewer.
 - All three refuse the identical text to the same person within 10 minutes: the refusal says when it went or was queued, so check the thread or `li_job_result`, never resend. `force: true` skips only that check, and only when the user explicitly wants the same text twice.
 
 **Inbox and conversations**
-- `li_replies_to_answer`: campaign people who replied; `includeThread: true` attaches the thread and a `suggestedOutcome` (a not_interested suggestion from a clear opt-out, never written: read the message first).
-- `li_list_conversations`: live browser read of the inbox, one account per call; `onlyNeedsReply` and `onlyAddressable` give the owed list. `reachedEnd` false = partial.
+- `li_replies_to_answer`: campaign people who replied; `includeThread: true` attaches the thread and a `suggestedOutcome` (a not_interested suggestion from a clear opt-out, never written: read the message first). Each row carries `activeChain` (`chainId`, `accountId`, `stage`, `label`, `nextStepDueAt`, `nextStepMode`, `stepsLeft`) or null; `endsAtNextPass: true` = they wrote after it started, so it stops by itself within the hour; `activeChainUnreadable` = the read failed, check `li_list_chains`.
+- `li_list_conversations`: live browser read of the inbox, one account per call; `onlyNeedsReply` and `onlyAddressable` give the owed list. `reachedEnd` false = partial. Rows carry `activeChain` or null; `activeChainLookupFailed` = the read failed, check `li_list_chains`.
 - `li_conversation_history`: stored thread, instant. Empty means never read, not never wrote.
 - `li_read_conversation`: read one thread live. Slow; only when nothing is stored.
 - `li_read_conversations_bulk`: live read of many named people in one session; about six at a time.
@@ -101,7 +115,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_mark_outcome`: the verdict (`won`, `meeting_booked`, `interested`, `not_interested`, `no_outcome`). A demo or a booked call is never `won`.
 - `li_mark_reply_handled`: the user did their part; says nothing about how it went.
 - `li_mark_replied`: flag a reply you spotted; stops the sequence.
-- `li_snooze_reply`: park a thread until a date (`until`). Nothing is sent when it ends.
+- `li_snooze_reply`: park a thread until a date (`until`). With a date it also ends the person's follow-up chains (`chainsCanceled`); start none. Nothing is sent when it ends.
 - `li_mark_reviewed`: record a thread as looked at (skip, vendor pitch) without a verdict.
 - `li_marked_conversations`: people with one verdict; `dueOnly` for snoozes that came due. `outcome: "undecided"` = the verdict queue: replied at least `repliedOlderThanHours` ago (default 48) with no verdict. `owedReply` rows: answer in `li_replies_to_answer` first.
 
@@ -118,18 +132,18 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_import_invitation_decisions`: one-time import of an old triage ledger. Preview until `confirmImport`.
 
 **Bookings** (you read the calendar; PoliteReach stores state and enforces limits)
-- `li_track_booking`: they agreed to a call (`agreed: true`, `agreedDayText`, `agreedDate`). Search the calendar first: already booked = `li_mark_booked` instead.
+- `li_track_booking`: they agreed to a call (`agreed: true`, `agreedDayText`, `agreedDate`). Search the calendar first: already booked = `li_mark_booked` instead. Ends every active follow-up chain on the person, on any account of the team, in the same write (`chainsCanceled`, `chainNote`): the booking follow-up owns them now, so `li_cancel_chain` first is not needed.
 - `li_match_contacts`: calendar attendees to prospects. Mark only `match`, never `ambiguous`. Skip `ignored`.
 - `li_ignore_calendar_event`: the user says a booking is not from LinkedIn (`eventId`, or `email` for all of theirs; `remove` undoes). `li_match_contacts` then answers `ignored`.
-- `li_mark_booked`: a call is on the calendar (`calendarEventId`, `meetingStart`); same event, new time is a move.
+- `li_mark_booked`: a call is on the calendar (`calendarEventId`, `meetingStart`); same event, new time is a move. A new booking ends the person's follow-up chains.
 - `li_mark_booking_cancelled`: the event is gone or cancelled.
 - `li_bookings`: booked calls to compare with the calendar.
-- `li_booking_due`: who is due a nudge or a close. Never contact anyone in `excluded`. `firstName`/`lastName` already come case-fixed.
+- `li_booking_due`: who is due a nudge or a close. Never contact anyone in `excluded`; never lists someone a follow-up chain owns (counted in `excluded.activeChain`). `firstName`/`lastName` already come case-fixed.
 - `li_set_booking_settings`: booking links (`bookingUrls`), the follow-up pace (`nudgeScheduleDays`, default [2, 5, 10]: days after each message of ours, the last one the close; 1-4 numbers, 1-30, never shrinking), `cancelRecheckHours`, name prefill. The old `maxNudges`, `closeAfterDays` and `firstNudgeHours` are refused.
 - Nudges and closes go out only through `li_send_reply` with `bookingNudge` or `bookingClose`.
 
 **Warm follow-up** (you write every word; PoliteReach holds the plan, the timing and the stop rules)
-- `li_create_followup_chain`: the next 1-4 touches for ONE person from ONE account (`steps`: `delayDays` 1-60 after our previous message, strictly growing; `channel` `linkedin` or `email`; `text`; `mode` `send` or `draft`). Email is always a draft. Preview until `confirmChain`. One active chain per person per account; `replaceExisting` replaces it. Stops by itself when they write on any channel, book a call, get a verdict or are suppressed.
+- `li_create_followup_chain`: the next 1-4 touches for ONE person from ONE account (`steps`: `delayDays` 1-60 after our latest message on any channel, strictly growing, never due under 2 hours after creation; `channel` `linkedin` or `email`; `text`; `mode` `send` (LinkedIn, sent in sending hours) or `draft` (waits in `li_warm_due`)). Email is always a draft. Preview until `confirmChain`; `idempotencyKey` on retries. One active chain per person per account; `replaceExisting` cancels the old one (only when our new reply changes the context). Refuses anyone who agreed to a call, and anyone booked unless `stage` is `no_show`, `call_done`, `proposal_sent`, `invited_not_activated` or `trial`; someone only sent the link is allowed. Stops by itself when they write on any channel, agree to a call, book one, get a final verdict (`won`, `not_interested`, `no_outcome`), are snoozed or suppressed.
 - `li_list_chains`: chains by person or account; `status` `active` (default), `completed`, `canceled` or `all`.
 - `li_cancel_chain`: stop one (`chainId`, or `profileUrl` + `sessionLabel`) with a short `reason`.
 - `li_set_stage`: where the deal stands, for `profileUrls`: `agreed`, `booked`, `no_show`, `call_done` (with `note`, `nextStep`, `owner`, `dueDate`), `proposal_sent`, `invited_not_activated`, `trial`, `paid`, `closed`, or null to clear. Not a verdict.
@@ -166,7 +180,7 @@ Every account-scoped tool takes `sessionLabel` (label, LinkedIn name, slug or me
 - `li_react_to_post`: react (Like by default) to one post from a named account. Preview until `confirmReact`. Shares the account's daily reaction cap with campaigns. A timeout returns a job id: never react again.
 - In a campaign, `engagePostUrl` on `li_ingest_prospects` reacts to that post first; the invite then follows about a day later, in the person's own morning window (or the account's sending hours; 18-30 hours with no window to aim at).
 
-Operator only, not for normal use: `li_trial_watch` (trials and paid grace ending soon, accounts stuck on a sign-in or security check, users who never launched a campaign, invited users who never connected LinkedIn; read-only), `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
+Operator only, not for normal use: `li_trial_watch` (trials and paid grace ending soon, accounts stuck on a sign-in or security check, users who never launched a campaign, invited users who never connected LinkedIn, recent cancellations and why; read-only), `li_host_health`, `li_selector_canary`, `li_proxies`, `li_check_proxy`, `li_set_account_proxy`, `li_set_user_default_proxy`, `li_set_team_billing`, `li_set_default_pricing_tier`, `li_set_team_complimentary`, `li_set_account_complimentary`, `li_set_team_discount` (a discount on a not-yet-subscribed team's first months, emailed to them; refused for a team that already pays), `li_set_trial_end_offer` (the automatic last offer after a trial), `li_hold_sending` (pauses every LinkedIn write on every account, at most 24 hours).
 
 ## Ground rules, everywhere
 

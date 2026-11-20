@@ -12,11 +12,15 @@ The full rules (stages, email steps, the warm queue) are in the `keep-warm-leads
 - "Not now, try in (month)": `li_snooze_reply` with `until`, no chain.
 - A final verdict, do-not-contact, or a thread flagged for the user: nobody.
 
-`li_track_booking` ends every active chain on the person (any account of the team) in the same write and says so (`chainsCanceled`, `chainNote`); `li_mark_booked` (a new booking) and `li_snooze_reply` (with a date) do the same. `li_cancel_chain` first is not needed. `li_create_followup_chain` refuses anyone who agreed to a call, and anyone with a call booked unless the chain is for an after-call stage (`no_show`, `call_done`, `proposal_sent`, `invited_not_activated`, `trial`). Someone only sent the booking link, who never agreed, is allowed: the booking follow-up never chases them, so the chain is their only follow-up.
+`li_track_booking` ends every active chain on the person (any account of the team) in the same write and says so (`chainsCanceled`, `chainNote`); `li_mark_booked` (a new booking) and `li_snooze_reply` (with a date) do the same. `li_cancel_chain` first is not needed. `li_create_followup_chain` refuses anyone who agreed to a call, and anyone with a call booked unless the chain is for an after-call stage (`no_show`, `call_done`, `proposal_sent`, `invited_not_activated`, `trial`). Someone only sent the booking link, who never agreed, is allowed: the booking follow-up never chases them, so the chain is their only follow-up. Its steps are all `draft`: PoliteReach reads no calendar, so a step sent by itself could chase someone who booked minutes ago. A draft step goes out only after the warm routine searched the calendar.
 
 ## When to start one
 
-After every reply of ours that leaves the thread open: we answered a question, sent what they asked for, or pushed the call (the booking link or "want to get on a call?") and they have not agreed. Never when they agreed, booked, got a final verdict, were snoozed or the thread was flagged.
+After every reply of ours that leaves the thread open: we answered a question, sent what they asked for, or made the ask (the user's outreach skill says what it is: a call, an audit, a resource) and they have not said yes. Never when they agreed, booked, got a final verdict, were snoozed or the thread was flagged.
+
+Their reply already stopped the campaign sequence, so without a chain nobody follows up after our answer. Their next message stops the chain in turn: answer it, and start a new chain if the thread is open again.
+
+Make the ask the way the user's skill says ("The ask" in `references/company.md`). For a call the default is ask first: "want to get on a call?", no link, and the link only in the reply to their yes.
 
 ## Part 1: settle it with the user
 
@@ -25,10 +29,11 @@ After every reply of ours that leaves the thread open: we answered a question, s
 
    | Situation | Steps (days) | Mode |
    |---|---|---|
-   | We answered a question or pushed the call, no agreement | 3 [day 3]: did that answer it, plus the one concrete next step (if the link is in the thread, point back to it, never paste it again). 4 [day 7]: one new useful thing not yet in the thread (a proof point or product fact), plus the ask. 7 [day 14]: the close | send |
-   | We sent what they asked for (a demo video, a case study, information) | 2 [day 2]: did you get a chance to look. 4 [day 6]: ask for the call. 7 [day 13]: the close | send |
+   | We answered a question or made the ask, no yes yet | 3 [day 3]: did that answer it, plus the one concrete next step. 4 [day 7]: one new useful thing not yet in the thread (a proof point or product fact), plus the ask. 7 [day 14]: the close | send |
+   | We sent what they asked for (a demo video, a case study, an audit, information) | 2 [day 2]: did you get a chance to look. 4 [day 6]: the ask (for a call: "want to get on a call?"). 7 [day 13]: the close | send |
+   | Our booking link is in the thread and they have not agreed | the same steps as the row that fits, pointing back to the link, never pasting it again; the link is the ask, so no new one | draft |
    | They said "will do", "let me check with the team" or "I'll get back to you" | 5 [day 5]: a light check. 7 [day 12]: the close | send |
-   | `no_show` | 1 [day 1]: offer to rebook. 4 [day 5]: the close | send |
+   | `no_show` (search the calendar first: rebooked = no chain) | 1 [day 1]: offer to rebook (ask to pick a new time; the link goes after a yes). 4 [day 5]: the close | send |
    | `call_done` [1, 5, 12], `proposal_sent` [3, 7, 14] | the stage template | draft |
    | `trial`, `invited_not_activated` [2, 5, 10] | the stage template | send |
 
@@ -36,7 +41,7 @@ After every reply of ours that leaves the thread open: we answered a question, s
    - `delayDays` (1-60): gaps strictly grow; the last step is the close; 1-4 steps. A step is never due less than 2 hours after the chain is created. Due times follow our latest message on any channel, so a chain created right after a reply is queued counts from that reply once it goes out.
    - `channel`: `linkedin`, or `email` when the thread moved to email (needs their address: `li_set_contact_email`).
    - `mode`:
-     - Send (LinkedIn only): the exact text approved now goes out by itself when due, inside the account's sending hours.
+     - Send (LinkedIn only): the exact text approved now goes out by itself when due, inside the account's sending hours. Never with the booking link in it.
      - Draft: when it falls due it waits in `li_warm_due` for the user's yes. Email steps are always drafts.
 3. The text of every step, written now for this person in the user's voice: what was said, what was agreed, the next step, never what the thread already covered. Nothing is written later; PoliteReach never generates text at send time.
 

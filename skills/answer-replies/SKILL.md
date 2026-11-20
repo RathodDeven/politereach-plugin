@@ -28,6 +28,7 @@ Read the full thread before judging: `li_conversation_history`. Only if nothing 
   - No calendar connector: never send to them. Flag for the user.
 - **They agreed to a call (not booked):** reply with the plain booking link (PoliteReach adds their name); if our link is in the last few messages, point to it instead of pasting it again. Then `li_track_booking` with `agreed: true`, their words as `agreedDayText`, and `agreedDate` (YYYY-MM-DD) if they named a day. A row flagged `bookingPending` wrote again after agreeing: answer what they said, never a booking nudge. `li_track_booking` already records them as `interested`: give them no other verdict and no `li_mark_reply_handled`. It also ends any follow-up chain on them (`chainsCanceled`): the booking follow-up owns them now, so no chain.
 - **They say they booked, but the calendar shows nothing yet:** send nothing; `li_mark_outcome` `meeting_booked` with a note. The booking check attaches the event later.
+- **Making the ask:** follow "The ask" in the user's outreach skill (`references/company.md`). It may be a call, an audit, a demo video or a resource. For a call the default is ask first: "want to get on a call?" with no link, and the link only in the reply to their yes (asking for the link or a time counts as a yes). Send the link before a yes only when their skill says "link straight away".
 - **Skip:** dead threads (a flat no, a thumbs up, a vendor pitching the user). Unsure between reply and skip: flag.
 
 ## 3. Send only what the user approved
@@ -62,7 +63,7 @@ A marked conversation reopens by itself if they write again.
 
 ## After you reply: one owner per open thread
 
-Every open thread has exactly one owner that follows up, so nobody is chased twice or forgotten:
+Their reply stops the campaign sequence, so after you answer nothing follows up unless something owns the thread. Every open thread has exactly one owner that follows up, so nobody is chased twice or forgotten:
 
 - Agreed to a call: the booking follow-up (`book-agreed-calls`), from `li_track_booking` until they book or it closes them.
 - Any other open thread where we spoke last and wait on them: a follow-up chain.
@@ -70,7 +71,7 @@ Every open thread has exactly one owner that follows up, so nobody is chased twi
 - "Not now, try in (month)": `li_snooze_reply`, no chain.
 - A final verdict, do-not-contact, or flagged for the user: nobody.
 
-Start a chain after every reply that leaves the thread open: you answered a question, sent what they asked for, or pushed the call (the link or "want to get on a call?") and they have not agreed. None when they agreed, booked, got a final verdict, were snoozed or were flagged. Check the row's `activeChain` first: replace it (`replaceExisting: true`) only when your reply changes what it should say, or when `endsAtNextPass` is true (they wrote since it started). A chain on another account (its `accountId` differs) is not replaced that way: leave it, or end it with `li_cancel_chain` first. The default shapes (which the user's outreach skill can override) and the steps are in `references/follow-up-task.md`; the same applies after a call, a no-show or a proposal. Show each reply with its chain: one yes covers both, so send, then `li_create_followup_chain` with `confirmChain: true`.
+Start a chain after every reply that leaves the thread open: you answered a question, sent what they asked for, or made the ask and they have not said yes. Their next message stops it; you answer, and a new chain follows if the thread is open again. A step that sends by itself never carries the booking link (PoliteReach reads no calendar): it asks. Someone who holds the link and has not agreed gets the same chain with every step `draft`, so it goes out only after a calendar check (the `keep-warm-leads` routine). None when they agreed, booked, got a final verdict, were snoozed or were flagged. Check the row's `activeChain` first: replace it (`replaceExisting: true`) only when your reply changes what it should say, or when `endsAtNextPass` is true (they wrote since it started). A chain on another account (its `accountId` differs) is not replaced that way: leave it, or end it with `li_cancel_chain` first. The default shapes (which the user's outreach skill can override) and the steps are in `references/follow-up-task.md`; the same applies after a call, a no-show or a proposal. Show each reply with its chain: one yes covers both, so send, then `li_create_followup_chain` with `confirmChain: true`.
 
 If they agree to a call later, `li_track_booking` ends the chain itself (`li_cancel_chain` first is harmless, not needed). `li_create_followup_chain` refuses anyone who agreed, and anyone booked unless the chain is for an after-call stage. Report each chain on one line: name, account, step due dates. The whole warm-lead workflow is the `keep-warm-leads` skill.
 

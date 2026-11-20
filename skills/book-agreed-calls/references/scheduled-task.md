@@ -76,7 +76,7 @@ If the thread shows they already booked, mark booked instead. If they changed th
 STEP 4: AFTER THE CALL
 li_bookings with status booked, from 7 days ago to now: calls whose start has passed. Skip anyone already given no_show, call_done or a later stage (li_contact_dossier shows it).
 - Gone or cancelled on the calendar: step 2 handles it.
-- The calendar or booking tool marks them a no-show: li_set_stage no_show, source routine, a note naming where it was marked. Then write the no_show chain from my skill's references/stage-templates.md for this person (every word written now; if it has none: a rebook offer, then a close, delayDays 1 and 4, mode send) under PROPOSED CHAINS.
+- The calendar or booking tool marks them a no-show: li_set_stage no_show, source routine, a note naming where it was marked. A newer booking for them on the calendar (they rebooked): match it as above and propose no chain. Otherwise write the no_show chain from my skill's references/stage-templates.md for this person (every word written now; if it has none: a rebook offer that asks them to pick a new time with no link, then a close, delayDays 1 and 4, mode send; a send-mode step never carries my booking link) under PROPOSED CHAINS.
 - Otherwise list the call under HOW DID IT GO with name, company and time, so I can say no_show, or call_done with what was agreed, the next step, the owner and a date. Never guess a no-show or a call done.
 Never create a chain in this run: I approve each one in chat, then it is created with li_create_followup_chain, stage set (no_show, call_done…), and confirmChain true.
 

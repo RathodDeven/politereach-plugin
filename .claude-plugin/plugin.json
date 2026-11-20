@@ -1,8 +1,8 @@
 {
 	"name": "politereach",
 	"displayName": "PoliteReach",
-	"version": "0.7.0",
-	"description": "Run LinkedIn outreach from your own LinkedIn accounts with Claude: research people, stage invite and message sequences for your approval, answer replies, accept the right invitations, follow up on agreed calls and warm leads, and schedule posts. Claude writes and decides; PoliteReach does the sending.",
+	"version": "0.8.0",
+	"description": "Run LinkedIn outreach from your own LinkedIn accounts with Claude: research people, write invite and message sequences and send them once you approve, answer replies, accept the right invitations, follow up on agreed calls and warm leads, and schedule posts. Claude writes and decides; PoliteReach does the sending.",
 	"author": {
 		"name": "PoliteReach",
 		"url": "https://politereach.com"

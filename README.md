@@ -76,7 +76,7 @@ Then install **PoliteReach** from the plugin list and sign in. Codex reads `.age
 | `using-politereach` | The overview: what to connect for each job (LinkedIn account, calendar for bookings, scheduled tasks), which skill does what, and every tool with its safety rule. |
 | `get-started` | Connects the connector and your LinkedIn account, checks the account really works, and explains its invite pace and settings. |
 | `outreach-skill-builder` | Interviews you about your company, ICPs and writing voice, then builds your own outreach skill that every other workflow writes with. |
-| `start-outreach` | From LinkedIn profile links: looks each person up, researches what is missing, matches an ICP, writes the whole sequence, stages it for your review and launches on your yes. |
+| `start-outreach` | From LinkedIn profile links: looks each person up, researches what is missing, matches an ICP, writes the whole sequence, shows it to you and launches on your yes. |
 | `answer-replies` | Finds every reply waiting on you, drafts answers, sends the ones you approve, starts the follow-ups for threads left open, and records how each conversation went. Can run on a schedule. |
 | `inbound-invitations` | Screens the invitations people sent you, accepts the ones that fit, and starts a short sequence for them. Can run on a schedule. |
 | `book-agreed-calls` | Tracks who agreed to a call, matches bookings on your calendar, and follows up on the pace you set (nudges, then one polite close). Can run on a schedule. |

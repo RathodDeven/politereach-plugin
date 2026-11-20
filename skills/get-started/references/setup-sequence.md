@@ -34,4 +34,4 @@ Set up only the ones they pick, one at a time: each has its own short interview,
 
 - List what now exists: the skill's name, each account's booking link as `li_list_accounts` shows it now (say "none saved" where it is empty), and each task's name and next run.
 - Remind the user to set every PoliteReach tool to always allow: nobody is there to approve a tool while a task runs.
-- Offer to start outreach now: they paste LinkedIn profile links and `start-outreach` stages the sequences for their yes.
+- Offer to start outreach now: they paste LinkedIn profile links and `start-outreach` writes the sequences, and their one yes to the preview launches them.
